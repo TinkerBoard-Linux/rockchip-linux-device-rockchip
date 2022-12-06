@@ -40,4 +40,6 @@ export RK_WIFIBT_CHIP=ALL_AP
 # Define BT ttySX
 export RK_WIFIBT_TTY=ttyS0
 # <dev>:<mount point>:<fs type>:<mount flags>:<source dir>:<image size(M|K|auto)>:[options]
-export RK_EXTRA_PARTITIONS="oem:/oem:ext2:defaults:oem_normal:auto:resize@userdata:/userdata:ext2:defaults:userdata_normal:auto:resize"
+export RK_EXTRA_PARTITIONS="userdata:/userdata:ext2:defaults:userdata_normal:auto:resize"
+# Define package-file for update.img
+export RK_PACKAGE_FILE=tinker_board_2-package-file
