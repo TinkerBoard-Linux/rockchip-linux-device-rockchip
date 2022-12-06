@@ -7,9 +7,9 @@ if ! which fakeroot &>/dev/null; then
     exit -1
 fi
 
-PARAMETER=device/rockchip/$RK_CHIP/$RK_PARAMETER
+PARAMETER=device/rockchip/tinker_board_2/$RK_PARAMETER
 MISC_IMG=device/rockchip/common/images/${RK_MISC:-blank-misc.img}
-MKIMAGE=device/rockchip/common/mk-image.sh
+MKIMAGE=device/rockchip/tinker_board_2/mk-image.sh
 
 message() {
     echo -e "\e[36m $@ \e[0m"
