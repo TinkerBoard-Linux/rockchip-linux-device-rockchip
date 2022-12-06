@@ -1,0 +1,1 @@
+BoardConfig-rk3399-tinker_board_2.mk
