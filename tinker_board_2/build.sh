@@ -1428,6 +1428,7 @@ build_allsave()
 	build_all
 	build_firmware
 	build_updateimg
+	sudo ./device/rockchip/tinker_board_2/sdboot.sh
 	build_save
 
 	build_check_power_domain
