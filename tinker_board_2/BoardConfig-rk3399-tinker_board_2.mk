@@ -3,11 +3,11 @@
 # Target arch
 export RK_KERNEL_ARCH=arm64
 # Uboot defconfig
-export RK_UBOOT_DEFCONFIG=rk3399
+export RK_UBOOT_DEFCONFIG=tinker_board_2
 # Kernel defconfig
-export RK_KERNEL_DEFCONFIG=rockchip_linux_defconfig
+export RK_KERNEL_DEFCONFIG=tinker_board_2_defconfig
 # Kernel dts
-export RK_KERNEL_DTS=rk3399-sapphire-excavator-linux
+export RK_KERNEL_DTS=rk3399-tinker_board_2
 # boot image type
 export RK_BOOT_IMG=boot.img
 # kernel image path
@@ -16,6 +16,8 @@ export RK_KERNEL_IMG=kernel/arch/arm64/boot/Image
 export RK_PARAMETER=parameter.txt
 # Buildroot config
 export RK_CFG_BUILDROOT=rockchip_rk3399
+# Build Debian by default
+export RK_ROOTFS_SYSTEM=debian
 # Recovery config
 export RK_CFG_RECOVERY=rockchip_rk3399_recovery
 # Pcba config
