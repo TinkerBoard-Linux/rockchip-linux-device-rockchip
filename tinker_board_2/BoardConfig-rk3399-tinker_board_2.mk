@@ -31,7 +31,7 @@ export RK_DEBIAN_VERSION=bullseye
 # yocto machine
 export RK_YOCTO_MACHINE=rockchip-rk3399-sapphire-excavator
 #misc image
-export RK_MISC=wipe_all-misc.img
+export RK_MISC=blank-misc.img
 # Define WiFi BT chip
 # Compatible with Realtek and AP6XXX WiFi : RK_WIFIBT_CHIP=ALL_AP
 # Compatible with Realtek and CYWXXX WiFi : RK_WIFIBT_CHIP=ALL_CY
