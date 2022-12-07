@@ -72,6 +72,7 @@ choose_board()
 
 COMMON_DIR="$(dirname "$(realpath "$0")")"
 TOP_DIR="$(realpath "$COMMON_DIR/../../..")"
+LIB_MODULES_DIR=$TOP_DIR/debian/lib_modules
 cd "$TOP_DIR"
 mkdir -p rockdev
 
@@ -893,8 +894,15 @@ build_modules()
 
 	setup_cross_compile
 
+	if [ -e $LIB_MODULES_DIR ]; then
+		rm -rf $LIB_MODULES_DIR
+	fi
+
+	mkdir -p $LIB_MODULES_DIR
+
 	$KMAKE $RK_KERNEL_DEFCONFIG $RK_KERNEL_DEFCONFIG_FRAGMENT
 	$KMAKE modules
+	$KMAKE modules_install INSTALL_MOD_PATH=$LIB_MODULES_DIR
 
 	finish_build
 }
@@ -1248,6 +1256,7 @@ build_all()
 	check_security_condition
 	build_loader
 	build_kernel
+	build_modules
 	build_rootfs
 	build_recovery
 
@@ -1270,6 +1279,7 @@ build_cleanall()
 
 	make -C u-boot distclean
 	make -C kernel distclean
+	rm -rf $LIB_MODULES_DIR
 	rm -rf buildroot/output
 	rm -rf yocto/build/tmp yocto/build/*cache
 	rm -rf debian/binary
