@@ -1442,6 +1442,16 @@ build_save()
 	mkdir -p $STUB_PATH/IMAGES/
 	cp $IMAGE_PATH/* $STUB_PATH/IMAGES/
 
+	if [ "$VERSION" == "release" ]; then
+		mkdir -p $STUB_PATH/$RELEASE_NAME
+		mv $STUB_PATH/IMAGES/sdboot.img $STUB_PATH/$RELEASE_NAME/$RELEASE_NAME.img
+		cd $STUB_PATH
+		zip -r $RELEASE_NAME.zip $RELEASE_NAME
+		sha256sum $RELEASE_NAME.zip > $RELEASE_NAME.zip.sha256sum
+		cd -
+		rm -rf $STUB_PATH/$RELEASE_NAME
+	fi
+
 	#Save build command info
 	echo "UBOOT:  defconfig: $RK_UBOOT_DEFCONFIG" >> $STUB_PATH/build_cmd_info
 	echo "KERNEL: defconfig: $RK_KERNEL_DEFCONFIG, dts: $RK_KERNEL_DTS" >> $STUB_PATH/build_cmd_info
