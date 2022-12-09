@@ -7,6 +7,9 @@ if ! which fakeroot &>/dev/null; then
     exit -1
 fi
 
+USER_DATA_DIR=device/rockchip/common/images/userdata/userdata_normal
+USER_DATA_DIR_TMP=rockdev/userdata_tmp
+
 PARAMETER=device/rockchip/tinker_board_2/$RK_PARAMETER
 MISC_IMG=device/rockchip/common/images/${RK_MISC:-blank-misc.img}
 MKIMAGE=device/rockchip/tinker_board_2/mk-image.sh
@@ -117,7 +120,7 @@ pack_extra_partitions() {
             /*)
                 ;;
             *)
-                SRC="device/rockchip/common/images/$PART_NAME/$SRC"
+                SRC="rockdev/userdata_tmp"
                 ;;
         esac
 
@@ -128,9 +131,8 @@ pack_extra_partitions() {
 
         # Skip existing prebuilt images
         if [ -f rockdev/$PART_NAME.img ]; then
-		message "Skip packing existing rockdev/$PART_NAME.img"
-		continue
-	fi
+            rm -rf rockdev/$PART_NAME.img
+        fi
 
         # Skip boot time resize by adding a tag file
         echo $OPTS | grep -wq fixed || touch "$SRC/.fixed"
@@ -138,13 +140,29 @@ pack_extra_partitions() {
         pack_image "$SRC" "${PART_NAME}.img" "$FS_TYPE" "$SIZE" "$LABEL" \
             "$EXTRA_CMD"
 
-        rm -rf "$SRC/.fixed"
+        rm -rf "$SRC"
     done
+}
+
+build_dtbo() {
+    rm -f $USER_DATA_DIR/overlays/*.dtbo
+    for file in $USER_DATA_DIR/overlays/*.dts
+    do
+        dts=${file##*/}
+        dtbo=${dts%.*}
+        dtc -@ -O dtb -o $USER_DATA_DIR/overlays/$dtbo.dtbo $USER_DATA_DIR/overlays/$dts
+    done
+
+    mkdir -p $USER_DATA_DIR_TMP
+    cp -r $USER_DATA_DIR/* $USER_DATA_DIR_TMP
+    rm $USER_DATA_DIR_TMP/overlays/*.dts
+    rm $USER_DATA_DIR_TMP/overlays/.gitignore
 }
 
 link_image_optional "$PARAMETER" parameter.txt
 link_image_optional "$MISC_IMG" misc.img
 
+build_dtbo
 pack_extra_partitions
 
 echo "Packed files:"
