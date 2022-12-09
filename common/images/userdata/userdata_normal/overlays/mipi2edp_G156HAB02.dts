@@ -1,0 +1,99 @@
+/dts-v1/;
+/plugin/;
+/ {
+	compatible = "rockchip,rk3399";
+
+	fragment@0 {
+		target = <&pwm0>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+	fragment@1 {
+		target = <&backlight>;
+		__overlay__ {
+			status = "okay";
+                        power-sequence-reverse;
+                        minimal-brightness-level = <20>;
+                        disable_delay = <15>;
+		};
+	};
+	fragment@2 {
+		target = <&i2c8>;
+		__overlay__ {
+			status = "okay";
+			dsi_edp_bridge: sn65dsi86@2d {
+				status = "okay";
+
+                                dsi-lanes = <4>;//u-boot
+		                data-lanes-size = <2>;//u-boot
+		                bpc=<8>;//u-boot
+		                data-lanes = <0 1>;
+		                lane-polarities = <0 0 0 0>;
+
+				t1=<0>;
+		                t2=<0>;
+		                t3=<200>;
+		                t4=<20>;
+		                t5=<0>;
+		                t6=<0>;
+		                t7=<0>;
+		                t8=<100>;
+		                t12= <500>;
+		                t14= <15>;
+		                t15 = <15>;
+		                t16= <15>;
+		                t17 = <15>;
+			};
+		};
+	};
+	fragment@3 {
+		target = <&dsi>;
+		__overlay__ {
+			status = "okay";
+			panel@0 {
+				backlight = <&backlight>;
+				width-mm = <344>;
+				height-mm = <193>;
+				bpc=<8>;
+				bus-format = <0x100a>;//<MEDIA_BUS_FMT_RGB888_1X24>;
+				dsi,flags = <0x3>;
+				dsi,format = <0>;//MIPI_DSI_FMT_RGB888:
+				dsi,lanes = <4>;
+
+				display-timings {
+					native-mode = <&timing86>;
+
+					timing86: timing86  {
+				            clock-frequency = <142000000>;
+				            hactive = <1920>;
+				            vactive = <1080>;
+				            hfront-porch = <108>;
+				            hsync-len = <48>;
+				            hback-porch = <24>;
+				            vfront-porch = <10>;
+				            vsync-len = <10>;
+				            vback-porch = <26>;
+				            hsync-active = <0>;
+				            vsync-active = <0>;
+				            de-active = <1>;
+				            pixelclk-active = <0>;
+			                 };
+				};
+			};
+		};
+	};
+       fragment@4 {
+		target = <&pinctrl>;
+		__overlay__ {
+			pinctrl-0 = <&gpio_init2>;
+			gpio_init_config {
+				gpio_init2: gpio_init2 {
+					rockchip,pins =
+						<2 19 0 &pcfg_pull_none>;
+				};
+			};
+		};
+	};
+
+};

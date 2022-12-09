@@ -1,0 +1,19 @@
+/dts-v1/;
+/plugin/;
+/ {
+	compatible = "rockchip,rk3399pro-evb-v11-linux";
+
+	fragment@0 {
+		target = <&dp_in_vopb>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@1 {
+		target = <&dp_in_vopl>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+};
