@@ -3,19 +3,35 @@
 if [ ! $VERSION ]; then
     VERSION="debug"
 fi
-echo "VERSION: $VERSION"
 
-if [ ! $VERSION_NUMBER ]; then
-	VERSION_NUMBER="eng"-"$USER"-"$(date +%Y%m%d)"
-	RELEASE_NAME="Tinker_Board_2-Debian-Bullseye-"
-else
-	VERSION_NUMBER="$VERSION_NUMBER"-"$(date +%Y%m%d)"
-	RELEASE_NAME="Tinker_Board_2-Debian-Bullseye-v"
-fi
-echo "VERSION_NUMBER: $VERSION_NUMBER"
+image_version()
+{
+	echo "VERSION: $VERSION"
 
-RELEASE_NAME="$RELEASE_NAME""$VERSION_NUMBER"
-echo "RELEASE_NAME: $RELEASE_NAME"
+	if [ ! $VERSION_NUMBER ]; then
+		VERSION_NUMBER="eng"-"$USER"-"$(date +%Y%m%d)"
+		if [ "$RK_ROOTFS_SYSTEM" = "ubuntu" ];then
+			RELEASE_NAME="Tinker_Board_2-Ubuntu-22.04.1-"
+		elif [ "$RK_ROOTFS_SYSTEM" = "debian" ];then
+			RELEASE_NAME="Tinker_Board_2-Debian-Bullseye-"
+		else
+			RELEASE_NAME="Tinker_Board_2-"
+		fi
+	else
+		VERSION_NUMBER="$VERSION_NUMBER"-"$(date +%Y%m%d)"
+		if [ "$RK_ROOTFS_SYSTEM" = "ubuntu" ];then
+			RELEASE_NAME="Tinker_Board_2-Ubuntu-22.04.1-v"
+		elif [ "$RK_ROOTFS_SYSTEM" = "debian" ];then
+			RELEASE_NAME="Tinker_Board_2-Debian-Bullseye-v"
+		else
+			RELEASE_NAME="Tinker_Board_2-v"
+		fi
+	fi
+	echo "VERSION_NUMBER: $VERSION_NUMBER"
+
+	RELEASE_NAME="$RELEASE_NAME""$VERSION_NUMBER"
+	echo "RELEASE_NAME: $RELEASE_NAME"
+}
 
 export LC_ALL=C
 export LD_LIBRARY_PATH=
@@ -1003,6 +1019,23 @@ build_debian()
 	finish_build
 }
 
+build_ubuntu()
+{
+	ARCH=${RK_DEBIAN_ARCH:-${RK_KERNEL_ARCH}}
+	case $ARCH in
+		arm|armhf) ARCH=armhf ;;
+		*) ARCH=arm64 ;;
+	esac
+
+	echo "=========Start building ubuntu ($ARCH) rootfs========="
+
+	cd debian
+	VERSION_NUMBER=$VERSION_NUMBER VERSION=$VERSION ARCH=$ARCH ./mk-rootfs-ubuntu.sh
+	./mk-image.sh
+
+	finish_build
+}
+
 build_rootfs()
 {
 	check_config RK_ROOTFS_TYPE || return 0
@@ -1024,6 +1057,11 @@ build_rootfs()
 			;;
 		debian)
 			build_debian
+			ln -rsf debian/linaro-rootfs.img \
+				$ROOTFS_DIR/rootfs.ext4
+			;;
+		ubuntu)
+			build_ubuntu
 			ln -rsf debian/linaro-rootfs.img \
 				$ROOTFS_DIR/rootfs.ext4
 			;;
@@ -1537,6 +1575,8 @@ if [ -d "$CHIP_DIR/build-hooks/" ]; then
 	done
 fi
 
+image_version
+
 # Fallback to current kernel
 RK_KERNEL_VERSION=${RK_KERNEL_VERSION:-$(kernel_version kernel/)}
 
@@ -1577,7 +1617,7 @@ for option in $POST_OPTIONS; do
 			exit 1 ;;
 		modules) build_modules ;;
 		rootfs) build_rootfs ;;
-		buildroot|debian|yocto) build_rootfs $option ;;
+		buildroot|debian|yocto|ubuntu) build_rootfs $option ;;
 		pcba) build_pcba ;;
 		recovery) build_recovery ;;
 		info) build_info ;;
