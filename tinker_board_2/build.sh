@@ -423,9 +423,8 @@ build_uboot()
 
 	ln -rsf u-boot/uboot.img rockdev/
 
-	if [ "$RK_UBOOT_FORMAT_TYPE" != "fit" ]; then
+	[ ! -e u-boot/trust.img ] || \
 		ln -rsf u-boot/trust.img rockdev/
-	fi
 
 	finish_build
 }
