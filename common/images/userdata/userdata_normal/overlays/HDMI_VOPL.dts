@@ -16,4 +16,11 @@
 			status = "okay";
 		};
 	};
+
+	fragment@2 {
+		target = <&route_hdmi>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
 };
