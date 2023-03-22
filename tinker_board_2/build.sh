@@ -14,6 +14,9 @@ image_version()
 			RELEASE_NAME="Tinker_Board_2-Ubuntu-22.04.1-"
 		elif [ "$RK_ROOTFS_SYSTEM" = "debian" ];then
 			RELEASE_NAME="Tinker_Board_2-Debian-Bullseye-"
+		elif [ "$RK_ROOTFS_SYSTEM" = "yocto" ];then
+			RELEASE_NAME="Tinker_Board_2-Yocto-Kirkstone-"
+			IMAGE_VERSION="$VERSION_NUMBER"_"$VERSION"
 		else
 			RELEASE_NAME="Tinker_Board_2-"
 		fi
@@ -23,6 +26,9 @@ image_version()
 			RELEASE_NAME="Tinker_Board_2-Ubuntu-22.04.1-v"
 		elif [ "$RK_ROOTFS_SYSTEM" = "debian" ];then
 			RELEASE_NAME="Tinker_Board_2-Debian-Bullseye-v"
+		elif [ "$RK_ROOTFS_SYSTEM" = "yocto" ];then
+			RELEASE_NAME="Tinker_Board_2-Yocto-Kirkstone-v"
+			IMAGE_VERSION="$VERSION_NUMBER"_"$VERSION"
 		else
 			RELEASE_NAME="Tinker_Board_2-v"
 		fi
@@ -984,9 +990,15 @@ build_yocto()
 
 	KERNEL_VERSION=$(kernel_version kernel/)
 
+	build_modules
+	cp -rf $LIB_MODULES_DIR/lib yocto/meta-asus/asus-overlay/overlay/
+
 	cd yocto
 	ln -sf $RK_YOCTO_MACHINE.conf build/conf/local.conf
+	sed -i -e '/IMAGE_VERSION/d' build/conf/local.conf
+	echo IMAGE_VERSION ?= \"$IMAGE_VERSION\" >> build/conf/local.conf
 	source oe-init-build-env
+	bitbake -c cleansstate core-image-minimal
 	LANG=en_US.UTF-8 LANGUAGE=en_US.en LC_ALL=en_US.UTF-8 \
 		bitbake core-image-minimal -r conf/include/rksdk.conf \
 		-r conf/include/kernel-$KERNEL_VERSION.conf
