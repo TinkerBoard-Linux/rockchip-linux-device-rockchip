@@ -985,7 +985,7 @@ build_yocto()
 	KERNEL_VERSION=$(kernel_version kernel/)
 
 	cd yocto
-	ln -rsf $RK_YOCTO_MACHINE.conf build/conf/local.conf
+	ln -sf $RK_YOCTO_MACHINE.conf build/conf/local.conf
 	source oe-init-build-env
 	LANG=en_US.UTF-8 LANGUAGE=en_US.en LC_ALL=en_US.UTF-8 \
 		bitbake core-image-minimal -r conf/include/rksdk.conf \
