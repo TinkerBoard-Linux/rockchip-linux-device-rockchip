@@ -5,7 +5,7 @@
 	compatible = "rockchip,rk3399";
 
 	fragment@0 {
-		target = <&dp_sound>;
+		target = <&spdif>;
 		__overlay__ {
 			status = "disabled";
 		};
