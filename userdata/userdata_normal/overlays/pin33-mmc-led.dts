@@ -1,0 +1,16 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "rockchip,rk3288-evb-rk808-linux", "rockchip,rk3288";
+
+	fragment@0 {
+		target-path = "/gpio-leds";
+		__overlay__ {
+			pin33-led {
+				gpios=<&gpio7 22 0>;
+				linux,default-trigger="mmc0";
+			};
+		};
+	};
+};
