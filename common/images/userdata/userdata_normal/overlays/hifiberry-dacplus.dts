@@ -15,7 +15,7 @@
 	};
 
 	fragment@1 {
-		target = <&spdif>;
+		target = <&dp_sound>;
 		__overlay__ {
 			status = "disabled";
 		};
