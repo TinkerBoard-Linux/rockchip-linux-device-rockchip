@@ -1,0 +1,88 @@
+/dts-v1/;
+/plugin/;
+/ {
+	compatible = "rockchip,rk3399";
+
+	fragment@0 {
+		target = <&pwm0>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+	fragment@1 {
+		target = <&backlight>;
+		__overlay__ {
+			status = "okay";
+            		minimal-brightness-level = <30>;
+		};
+	};
+	fragment@2 {
+		target = <&i2c8>;
+		__overlay__ {
+			status = "okay";
+			dsi_lvds_bridge2: lt9211@2d {
+				status = "okay";
+				lvds-format = <2>;//VESA
+				lvds-bpp = <24>;
+				dual-link;
+				de-mode;
+				//test-pattern;
+			};
+		};
+	};
+	fragment@3 {
+		target = <&dsi>;
+		__overlay__ {
+			status = "okay";
+			panel@0 {
+				backlight = <&backlight>;
+
+				width-mm = <495>;
+				height-mm = <292>;
+				bpc=<8>;
+				bus-format = <0x100a>;//<MEDIA_BUS_FMT_RGB888_1X24>;
+				dsi,flags = <0x3>;
+				dsi,format = <0>;//MIPI_DSI_FMT_RGB888:
+				dsi,lanes = <4>;
+
+				t1=<25>;//VCC on to start lvds signal
+				t2=<250>;//LVDS signal(start) to turn Backlihgt on
+				t3=<250>;//Backlihgt(off) to stop lvds signal
+				t4=<25>;//LVDS signal to turn VCC off
+				t5=<1000>;//VCC off to turn VCC on
+
+				display-timings {
+					native-mode = <&timing84>;//keep use for 84 timing
+
+					timing84: timing84  {
+						clock-frequency = <148500000>;
+						hactive = <1920>;
+						vactive = <1080>;
+						hfront-porch = <112>;
+						hback-porch = <112>;
+						hsync-len = <56>;
+						vfront-porch = <18>;
+						vsync-len = <9>;
+						vback-porch = <18>;
+						hsync-active = <0>;
+						vsync-active = <0>;
+						de-active = <1>;
+						pixelclk-active = <0>;
+					};
+				};
+			};
+		};
+	};
+       fragment@4 {
+		target = <&pinctrl>;
+		__overlay__ {
+			pinctrl-0 = <&gpio_init2>;
+			gpio_init_config {
+				gpio_init2: gpio_init2 {
+					rockchip,pins =
+						<2 19 0 &pcfg_pull_none>;
+				};
+			};
+		};
+	};
+};
