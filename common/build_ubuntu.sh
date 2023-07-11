@@ -107,6 +107,7 @@ function unset_board_config_all()
 CMD=`realpath $0`
 COMMON_DIR=`dirname $CMD`
 TOP_DIR=$(realpath $COMMON_DIR/../../..)
+LIB_MODULES_DIR=$TOP_DIR/debian/lib_modules
 cd $TOP_DIR
 
 BOARD_CONFIG=$TOP_DIR/device/rockchip/.BoardConfig.mk
@@ -339,9 +340,15 @@ function build_modules(){
 	echo "TARGET_KERNEL_CONFIG_FRAGMENT =$RK_KERNEL_DEFCONFIG_FRAGMENT"
 	echo "=================================================="
 
+  if [ -e $LIB_MODULES_DIR ]; then
+    rm -rf $LIB_MODULES_DIR
+  fi
+  mkdir -p $LIB_MODULES_DIR
+
 	cd kernel
 	make ARCH=$RK_ARCH $RK_KERNEL_DEFCONFIG $RK_KERNEL_DEFCONFIG_FRAGMENT
 	make ARCH=$RK_ARCH modules -j$RK_JOBS
+  make ARCH=$RK_ARCH modules_install INSTALL_MOD_PATH=$LIB_MODULES_DIR
 
 	finish_build
 }
@@ -554,6 +561,7 @@ function build_all(){
 
 	build_loader
 	build_kernel
+  build_modules
 	build_toolchain
 	build_rootfs ${RK_ROOTFS_SYSTEM:-buildroot}
 	build_recovery
@@ -571,6 +579,7 @@ function build_cleanall(){
 	cd kernel
 	make distclean
 	cd -
+  rm -rf $LIB_MODULES_DIR
 	rm -rf buildroot/output
 	rm -rf yocto/build/tmp
 	rm -rf distro/output
