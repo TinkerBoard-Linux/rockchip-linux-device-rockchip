@@ -300,6 +300,22 @@ main()
 	export RK_CONFIG="$RK_OUTDIR/.config"
 	export RK_DEFCONFIG_LINK="$RK_OUTDIR/defconfig"
 
+	if [ ! $VERSION ]; then
+		export VERSION="debug"
+	fi
+	echo $VERSION
+
+	if [ ! $VERSION_NUMBER ]; then
+		VERSION_NUMBER="eng-$USER"
+	fi
+	VERSION_NUMBER="$VERSION_NUMBER-$(date +%Y%m%d)"
+
+	if [ "$VERSION" == "debug" ]; then
+		export VERSION_NUMBER="$VERSION_NUMBER-debug"
+	elif [ "$VERSION" == "release" ]; then
+		export VERSION_NUMBER="$VERSION_NUMBER-release"
+	fi
+
 	# For Makefile
 	case "$@" in
 		make-targets | make-usage)
@@ -391,6 +407,20 @@ main()
 	# Load config environments
 	source "$RK_CONFIG"
 	cp "$RK_CONFIG" "$RK_LOG_DIR"
+
+	if [ "$RK_ROOTFS_SYSTEM" = "debian" ];then
+		PROJECT_NAME="$RK_PROJECT_NAME-Debian-Bullseye"
+	elif [ "$RK_ROOTFS_SYSTEM" = "yocto" ];then
+		PROJECT_NAME="$RK_PROJECT_NAME-Yocto-Kirkstone"
+		export IMAGE_VERSION="$VERSION_NUMBER"
+	fi
+
+	export RELEASE_NAME="$PROJECT_NAME-$VERSION_NUMBER"
+
+	echo "VERSION_NUMBER: $VERSION_NUMBER"
+	echo "RELEASE_NAME: $RELEASE_NAME"
+
+	export LIB_MODULES_DIR=$SDK_DIR/debian/lib_modules
 
 	if [ -z "$INITIAL_SESSION" ]; then
 		# Inherit session environments

@@ -1,0 +1,93 @@
+/dts-v1/;
+/plugin/;
+/ {
+	compatible = "rockchip,rk3399";
+
+	fragment@0 {
+		target = <&pwm0>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+	fragment@1 {
+		target = <&backlight>;
+		__overlay__ {
+			status = "okay";
+			pwms = <&pwm0 0 5000000 0>;
+                        power-sequence-reverse;
+                        disable_delay = <15>;
+                        minimal-brightness-level = <30>;
+		};
+	};
+	fragment@2 {
+		target = <&i2c8>;
+		__overlay__ {
+			status = "okay";
+			dsi_lvds_bridge: sn65dsi84@2c {
+				status = "okay";
+				lvds-clk-rate = <76000000>;
+				lvds-format = <2>;
+				lvds-bpp = <24>;
+                                dsi-lanes = <4>;
+				sync_delay = <33>;
+
+				t1=<0>;
+				t2=<1>;
+				t3=<500>;
+				t4=<200>;
+				t5=<1>;
+				t6=<0>;
+				t7=<1000>;
+			};
+		};
+	};
+	fragment@3 {
+		target = <&dsi>;
+		__overlay__ {
+			status = "okay";
+			panel@0 {
+				backlight = <&backlight>;
+
+				width-mm = <344>;
+				height-mm = <193>;
+				bpc=<8>;
+				bus-format = <0x100a>;//<MEDIA_BUS_FMT_RGB888_1X24>;
+				dsi,flags = <0x3>;
+				dsi,format = <0>;
+				dsi,lanes = <4>;
+
+				display-timings {
+					native-mode = <&timing84>;
+
+					timing84: timing84  {
+						clock-frequency = <76000000>;
+						hactive = <1366>;
+						vactive = <768>;
+						hfront-porch = <80>;
+						hback-porch = <80>;
+						hsync-len = <34>;
+						vfront-porch = <15>;
+						vsync-len = <8>;
+						vback-porch = <15>;
+						hsync-active = <0>;
+						vsync-active = <0>;
+						de-active = <1>;
+						pixelclk-active = <0>;
+					};
+				};
+			};
+		};
+	};
+       fragment@4 {
+		target = <&pinctrl>;
+		__overlay__ {
+			pinctrl-0 = <&gpio_init2>;
+			gpio_init_config {
+				gpio_init2: gpio_init2 {
+					rockchip,pins =
+						<2 19 0 &pcfg_pull_none>;
+				};
+			};
+		};
+	};
+};

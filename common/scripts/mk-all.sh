@@ -27,6 +27,7 @@ build_all()
 
 	if [ "$RK_KERNEL_CFG" ]; then
 		"$SCRIPTS_DIR/mk-kernel.sh"
+		"$SCRIPTS_DIR/mk-kernel.sh" modules
 		"$SCRIPTS_DIR/mk-rootfs.sh"
 		"$SCRIPTS_DIR/mk-recovery.sh"
 	fi
@@ -51,14 +52,16 @@ build_save()
 	echo "=========================================="
 
 	shift
-	SAVE_BASE_DIR="$RK_OUTDIR/$BOARD${1:+/$1}"
-	case "$(grep "^ID=" "$RK_OUTDIR/os-release" 2>/dev/null)" in
-		ID=buildroot) SAVE_DIR="$SAVE_BASE_DIR/BUILDROOT" ;;
-		ID=debian) SAVE_DIR="$SAVE_BASE_DIR/DEBIAN" ;;
-		ID=poky) SAVE_DIR="$SAVE_BASE_DIR/YOCTO" ;;
-		*) SAVE_DIR="$SAVE_BASE_DIR" ;;
-	esac
-	[ "$1" ] || SAVE_DIR="$SAVE_DIR/$(date  +%Y%m%d_%H%M%S)"
+	#SAVE_BASE_DIR="$RK_OUTDIR/$BOARD${1:+/$1}"
+	#case "$(grep "^ID=" "$RK_OUTDIR/os-release" 2>/dev/null)" in
+	#	ID=buildroot) SAVE_DIR="$SAVE_BASE_DIR/BUILDROOT" ;;
+	#	ID=debian) SAVE_DIR="$SAVE_BASE_DIR/DEBIAN" ;;
+	#	ID=poky) SAVE_DIR="$SAVE_BASE_DIR/YOCTO" ;;
+	#	*) SAVE_DIR="$SAVE_BASE_DIR" ;;
+	#esac
+	#[ "$1" ] || SAVE_DIR="$SAVE_DIR/$(date  +%Y%m%d_%H%M%S)"
+	SAVE_BASE_DIR=$SDK_DIR/IMAGE
+	SAVE_DIR=$SAVE_BASE_DIR/$RELEASE_NAME
 	mkdir -p "$SAVE_DIR"
 	rm -rf "$SAVE_BASE_DIR/latest"
 	ln -rsf "$SAVE_DIR" "$SAVE_BASE_DIR/latest"
@@ -99,6 +102,14 @@ build_save()
 
 	echo "Saving build logs..."
 	cp -rp "$RK_LOG_BASE_DIR" "$SAVE_DIR/"
+
+	if [ "$VERSION" == "release" ]; then
+		mv $SAVE_DIR/IMAGES/sdboot.img $SAVE_DIR/$RELEASE_NAME.img
+		zip -j -m -T $SAVE_DIR/$RELEASE_NAME.zip $SAVE_DIR/$RELEASE_NAME.img
+		cd $SAVE_DIR
+		sha256sum $SAVE_DIR/$RELEASE_NAME.zip > $SAVE_DIR/$RELEASE_NAME.zip.sha256sum
+		cd -
+	fi
 
 	finish_build
 }

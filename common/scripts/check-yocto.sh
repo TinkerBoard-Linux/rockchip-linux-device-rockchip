@@ -2,13 +2,13 @@
 
 SCRIPTS_DIR="${SCRIPTS_DIR:-$(dirname "$(realpath "$0")")}"
 
-if ! ping google.com -c 1 -W 1 &>/dev/null; then
-	echo -e "\e[35m"
-	echo "Your network is not able to access google.com"
-	echo "Please setup a VPN to bypass the GFW."
-	echo -e "\e[0m"
-	exit 1
-fi
+#if ! ping google.com -c 1 -W 1 &>/dev/null; then
+#	echo -e "\e[35m"
+#	echo "Your network is not able to access google.com"
+#	echo "Please setup a VPN to bypass the GFW."
+#	echo -e "\e[0m"
+#	exit 1
+#fi
 
 if ! which zstd >/dev/null 2>&1; then
 	echo -e "\e[35m"

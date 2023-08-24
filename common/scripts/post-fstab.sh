@@ -65,6 +65,12 @@ fixup_device_part()
 
 	# Dev is either <name> or /dev/.../<name> or <UUID|LABEL|PARTLABEL>=xxx
 	[ "$DEV" ] || return 0
+
+	if [ "$DEV" = userdata ]; then
+		echo "userdata don't assign to PARTLABEL !!!!"
+		return 0
+	fi
+
 	echo $DEV | grep -qE "^/|=" || DEV="PARTLABEL=$DEV"
 
 	MOUNTPOINT="${2:-/${DEV##*[/=]}}"

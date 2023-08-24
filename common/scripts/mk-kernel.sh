@@ -71,7 +71,15 @@ do_build()
 				fi
 			fi
 			;;
-		modules) run_command $KMAKE modules ;;
+		modules)
+			if [ -e $LIB_MODULES_DIR ]; then
+				rm -rf $LIB_MODULES_DIR
+			fi
+			mkdir -p $LIB_MODULES_DIR
+
+			run_command $KMAKE modules
+			run_command $KMAKE modules_install INSTALL_MOD_PATH=$LIB_MODULES_DIR
+			;;
 	esac
 }
 

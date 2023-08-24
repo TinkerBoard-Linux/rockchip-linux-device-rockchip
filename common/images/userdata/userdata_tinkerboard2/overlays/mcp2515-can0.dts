@@ -1,0 +1,71 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "rockchip,rk3399-tinker_board_2", "rockchip,rk3399";
+
+    /* enable spi-dev for spi1 */
+    fragment@0 {
+        target = <&spi1>;
+        __overlay__ {
+            status = "okay";
+        };
+    };
+
+    /* the interrupt pin of the can-controller */
+    /* Hat uses physical pin 16 (GPIO4_D2) which converts to gpio 154 4*32+3*8+2 */ 
+    /* Hat uses physical pin 16 (GPIO3_D4) which converts to gpio 124 3*32+3*8+4 */
+    /* GPIO3D4 interrupts 8*3+4 = 28 */
+
+    fragment@1 {
+    target = <&pinctrl>;
+        __overlay__ {
+            can0_pins: can0_pins {
+                rockchip,pins = <3 124 1 &pcfg_output_low>;
+            };
+        };
+    };
+
+    /* the clock/oscillator of the can-controller */
+    fragment@2 {
+        target-path = "/";
+        __overlay__ {
+            /* external oscillator of mcp2515 on SPI1 */
+
+            can0_osc: can0_osc {
+                compatible = "fixed-clock";
+                #clock-cells = <0>;
+                clock-frequency  = <12000000>;
+                clock-output-names = "can0_osc";
+            };
+        };
+    };
+
+    /* the spi config of the can-controller itself binding everything together */
+
+    fragment@3 {
+        target = <&spi1>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            can0: mcp2515@0 {
+                reg = <0>;
+                compatible = "microchip,mcp2515";
+                pinctrl-names = "default";
+                #pinctrl-0 = <&can0_pins>;
+                spi-max-frequency = <12000000>;
+                interrupt-parent = <&gpio3>;
+                interrupts = <28 8>; 
+                clocks = <&can0_osc>;
+            };
+        };
+    };
+
+
+    __overrides__ {
+        oscillator = <&can0_osc>,"clock-frequency:0";
+        spimaxfrequency = <&can0>,"spi-max-frequency:0";
+        interrupt = <&can0_pins>,"rockchip,pins:0",<&can0>,"interrupts:0";
+    };
+
+};

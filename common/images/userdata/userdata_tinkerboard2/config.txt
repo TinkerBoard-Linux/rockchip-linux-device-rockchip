@@ -1,0 +1,61 @@
+##### Hardware Interface Config #####
+
+## Note: uart4 and spi1 are the same pins. Set the latter one while both on. ##
+## Note: DP_Sound is based on spdif function. ##
+
+intf:fiq_debugger=on
+#intf:uart0=off
+#intf:uart4=off
+#intf:i2c6=off
+#intf:i2c7=off
+#intf:i2s0=off
+#intf:spdif=on
+#intf:spi1=off
+#intf:spi5=off
+#intf:pwm0=off
+#intf:pwm1=off
+#intf:pwm3a=off
+#intf:test_clkout2=off
+
+##### Driver Config #####
+
+## Note: auto_ums: Auto enable ums mode while power on with USB connected. ##
+
+conf:eth_wakeup=on
+conf:auto_ums=on
+
+##### Tinker Power Management #####
+
+cpu_governor=ondemand
+a53_minfreq=408000
+a53_maxfreq=1512000
+a72_minfreq=408000
+a72_maxfreq=2016000
+
+gpu_governor=simple_ondemand
+t86x_minfreq=200000000
+t86x_maxfreq=800000000
+
+##### List of device tree overlays to load. Format: overlay=<dtbo name, no extension> <dtbo2> ... #####
+
+## Note: Put dtbo files under the overlays folder. ##
+
+#
+# There are two display controller, VOPB and VOPL.
+# The default state is VOPB connet to HDMI, VOPL to DP/mipi-dsi panel.
+# If you want to change VOPB to DP, please modify the overlay as following:
+# 	overlay=DP_VOPB
+# If you want to change VOPL to HDMI, please modify the overlay as following:
+# 	overlay=HDMI_VOPL
+#
+# There are two CSI interface for camera, CSI0 and CSI1. CSI1 can switch to DSI1 for connecting mipi-dsi panel.
+# The default state is OV5647 connect CSI0, IMX219 connect CSI1.
+# If you want to change OV5647 connect CSI1, please modify the overlay as following:
+# 	overlay=CSI1-OV5647
+# If you want to change IMX219 connect CSI0, please modify the overlay as following:
+# 	overlay=CSI0-IMX219
+# If you want to connect two mipi-dsi panel, you need switch CSI1 to DSI1, please modify the overlay as following:
+# 	overlay=panel-asus-DSI1-overlay
+#
+
+overlay=

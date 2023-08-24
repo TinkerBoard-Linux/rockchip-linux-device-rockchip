@@ -17,4 +17,8 @@ config RK_SAVE_ALL
 
 endchoice
 
+config RK_PROJECT_NAME
+	string "project name "
+	default "Tinker_Board_2""
+
 endmenu # Others

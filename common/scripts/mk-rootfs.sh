@@ -28,6 +28,8 @@ build_yocto()
 
 	"$SCRIPTS_DIR/check-yocto.sh"
 
+	cp -rf $LIB_MODULES_DIR/lib yocto/meta-asus/asus-overlay/overlay/
+
 	cd yocto
 	rm -f build/conf/local.conf
 
@@ -55,6 +57,10 @@ build_yocto()
 		echo "=========================================="
 	fi
 
+	sed -i -e '/IMAGE_VERSION/d' build/conf/local.conf
+	echo IMAGE_VERSION ?= \"$IMAGE_VERSION\" >> build/conf/local.conf
+	echo RK_PROJECT_NAME ?= \"$RK_PROJECT_NAME\" >> build/conf/local.conf
+
 	{
 		if [ "$RK_WIFIBT_CHIP" ]; then
 			echo "include include/wifibt.conf"
@@ -79,6 +85,7 @@ build_yocto()
 	} > build/conf/rksdk_override.conf
 
 	source oe-init-build-env build
+	bitbake -c cleansstate core-image-minimal
 	LANG=en_US.UTF-8 LANGUAGE=en_US.en LC_ALL=en_US.UTF-8 \
 		bitbake core-image-minimal -f -c rootfs -c image_complete \
 		-R conf/rksdk_override.conf
@@ -104,14 +111,15 @@ build_debian()
 	echo "=========================================="
 
 	cd debian
-	if [ ! -f linaro-$RK_DEBIAN_VERSION-alip-*.tar.gz ]; then
+	ROOTFS_BASE_DIR="../rootfs-base"
+	if [ ! -f linaro-$RK_DEBIAN_VERSION-$ARCH.tar.gz ]; then
 		RELEASE=$RK_DEBIAN_VERSION TARGET=desktop ARCH=$ARCH \
 			./mk-base-debian.sh
-		ln -sf linaro-$RK_DEBIAN_VERSION-alip-*.tar.gz \
+		ln -rsf $ROOTFS_BASE_DIR/linaro-$RK_DEBIAN_VERSION-alip-$ARCH-*.tar.gz \
 			linaro-$RK_DEBIAN_VERSION-$ARCH.tar.gz
 	fi
 
-	VERSION=debug ARCH=$ARCH ./mk-rootfs-$RK_DEBIAN_VERSION.sh
+	VERSION=$VERSION VERSION_NUMBER=$VERSION_NUMBER ARCH=$ARCH ./mk-rootfs-$RK_DEBIAN_VERSION.sh
 	./mk-image.sh
 
 	ln -rsf "$PWD/linaro-rootfs.img" $ROOTFS_DIR/rootfs.ext4
@@ -135,6 +143,7 @@ clean_hook()
 {
 	rm -rf yocto/build/tmp yocto/build/*cache
 	rm -rf debian/binary
+	rm -rf $LIB_MODULES_DIR
 
 	if check_config RK_BUILDROOT_CFG &>/dev/null; then
 		rm -rf buildroot/output/$RK_BUILDROOT_CFG

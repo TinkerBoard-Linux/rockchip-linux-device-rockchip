@@ -1,0 +1,24 @@
+/dts-v1/;
+/plugin/;
+/ {
+	compatible = "rockchip,rk3399";
+
+	fragment@0 {
+		target = <&i2c7>;
+		__overlay__ {
+
+			ilitek@41 {
+				compatible = "tchip,ilitek";
+				reg = <0x41>;
+				interrupt-parent = <&gpio3>;
+				interrupts = <30 0x0>;
+				ilitek,irq-gpio = <&gpio3 30 0x0>;
+				ilitek,reset-gpio = <&gpio3 29 0x0>;
+				ilitek,vbus = "vcc_i2c";
+				ilitek,vdd = "vdd";
+				ilitek,name = "ilitek_i2c";
+				status = "okay";
+			};
+		};
+	};
+};

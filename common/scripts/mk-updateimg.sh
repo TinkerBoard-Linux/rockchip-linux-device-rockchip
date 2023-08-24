@@ -97,6 +97,8 @@ build_updateimg()
 	ln -rsf "$IMAGE_DIR/update.img" "$OUT_DIR"
 	ln -rsf "$IMAGE_DIR/update.img" "$TARGET"
 
+	sudo $SCRIPTS_DIR/sdboot.sh
+
 	finish_build build_updateimg $@
 }
 

@@ -1,0 +1,15 @@
+RK_YOCTO_CFG="rockchip-rk3399-tinker_board_2"
+RK_KERNEL_DTS_NAME="rk3399-tinker_board_2"
+RK_PARAMETER="parameter-tinkerboard2.txt"
+RK_ROOTFS_SYSTEM_YOCTO=y
+RK_ROOTFS_SYSTEM_DEBIAN=n
+RK_ROOTFS_SYSTEM="yocto"
+RK_UBOOT_CFG="tinker_board_2"
+RK_KERNEL_CFG="tinker_board_2_defconfig"
+RK_PACKAGE_FILE_CUSTOM=y
+RK_PACKAGE_FILE="tinker_board_2-package-file"
+RK_MISC_IMG="blank-misc.img"
+RK_EXTRA_PARTITION_NUM=1
+RK_EXTRA_PARTITION_1_DEV="userdata"
+RK_EXTRA_PARTITION_1_SRC="tinkerboard2"
+RK_PROJECT_NAME="Tinker_Board_2"

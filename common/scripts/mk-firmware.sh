@@ -43,6 +43,22 @@ pack_extra_partitions() {
 
 		rk_extra_part_prepare $idx
 
+		if [ "$PART_NAME" = userdata ]; then
+			message "Auto build dtbo in $PART_NAME..."
+			rm -f $OUTDIR/overlays/*.dtbo
+
+			for file in $OUTDIR/overlays/*.dts
+			do
+				dts=${file##*/}
+				dtbo=${dts%.*}
+				if [ "$dts" = "*.dts"  ]; then
+					break
+				fi
+				dtc -@ -O dtb -o $OUTDIR/overlays/$dtbo.dtbo $OUTDIR/overlays/$dts
+			done
+			rm -f $OUTDIR/overlays/*.dts
+		fi
+
 		if [ "$SIZE" = max ]; then
 			SIZE="$(partition_size_kb "$PART_NAME")K"
 			if [ "$SIZE" = 0K ]; then
