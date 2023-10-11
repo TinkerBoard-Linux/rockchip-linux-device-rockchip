@@ -91,7 +91,7 @@ build_save()
 		echo "Saving patches..."
 		PATCHES_DIR="$SAVE_DIR/PATCHES"
 		mkdir -p "$PATCHES_DIR"
-		.repo/repo/repo forall -j $(( $CPUS + 1 )) -c \
+		python3 .repo/repo/repo forall -j $(( $CPUS + 1 )) -c \
 			"\"$SCRIPTS_DIR/save-patches.sh\" \
 			\"$PATCHES_DIR/\$REPO_PATH\" \$REPO_PATH \$REPO_LREV"
 		install -D -m 0755 "$RK_DATA_DIR/apply-all.sh" "$PATCHES_DIR"
