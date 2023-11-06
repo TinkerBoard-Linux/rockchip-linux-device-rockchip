@@ -70,6 +70,13 @@ do_build()
 						"$RK_KERNEL_IMG"
 				fi
 			fi
+
+			if [ "$RK_WIFIBT_CHIP" ] && [ -r "$RK_KERNEL_DTB" ] && \
+				! grep -wq wireless-bluetooth "$RK_KERNEL_DTB"; then
+				echo -e "\e[35m"
+				echo "Missing wireless-bluetooth in $RK_KERNEL_DTS!"
+				echo -e "\e[0m"
+			fi
 			;;
 		modules)
 			if [ -e $LIB_MODULES_DIR ]; then
@@ -95,11 +102,13 @@ usage_hook()
 	echo -e "modules[:cmds]                   \tbuild kernel modules"
 	echo -e "linux-headers[:cmds]             \tbuild linux-headers"
 	echo -e "kernel-config[:cmds]             \tmodify kernel defconfig"
+	echo -e "kernel-make[:<arg1>:<arg2>]      \trun kernel make (alias kmake)"
 }
 
 clean_hook()
 {
 	[ ! -d kernel ] || make -C kernel distclean
+	rm -f "$RK_OUTDIR/linux-headers.tar"
 }
 
 INIT_CMDS="default $KERNELS"
@@ -126,6 +135,7 @@ PRE_BUILD_CMDS="kernel-config kernel-make kmake"
 pre_build_hook()
 {
 	check_config RK_KERNEL_CFG || return 0
+	source "$SCRIPTS_DIR/kernel-helper"
 
 	echo "Toolchain for kernel:"
 	echo "${RK_KERNEL_TOOLCHAIN:-gcc}"
@@ -135,6 +145,14 @@ pre_build_hook()
 		kernel-make | kmake)
 			shift
 			[ "$1" != cmds ] || shift
+
+			if [ "$DRY_RUN" ]; then
+				echo -e "\e[35mCommands of building ${@:-stuff}:\e[0m"
+			else
+				echo "=========================================="
+				echo "          Start building $@"
+				echo "=========================================="
+			fi
 
 			if [ ! -r kernel/.config ]; then
 				run_command $KMAKE $RK_KERNEL_CFG \
@@ -161,6 +179,7 @@ BUILD_CMDS="$KERNELS kernel modules"
 build_hook()
 {
 	check_config RK_KERNEL_DTS_NAME RK_KERNEL_CFG RK_BOOT_IMG || return 0
+	source "$SCRIPTS_DIR/kernel-helper"
 
 	echo "Toolchain for kernel:"
 	echo "${RK_KERNEL_TOOLCHAIN:-gcc}"
@@ -198,6 +217,7 @@ POST_BUILD_CMDS="linux-headers"
 post_build_hook()
 {
 	check_config RK_KERNEL_DTS_NAME RK_KERNEL_CFG RK_BOOT_IMG || return 0
+	source "$SCRIPTS_DIR/kernel-helper"
 
 	[ "$1" = "linux-headers" ] || return 0
 	shift

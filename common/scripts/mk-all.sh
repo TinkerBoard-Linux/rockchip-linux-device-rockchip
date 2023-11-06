@@ -15,6 +15,7 @@ build_all()
 
 	if [ "$RK_RTOS" ]; then
 		"$SCRIPTS_DIR/mk-loader.sh"
+		"$SCRIPTS_DIR/mk-kernel.sh"
 		"$SCRIPTS_DIR/mk-rtos.sh"
 		"$SCRIPTS_DIR/mk-firmware.sh"
 		finish_build
@@ -98,7 +99,7 @@ build_save()
 	fi
 
 	cp "$RK_FINAL_ENV" "$RK_CONFIG" "$RK_DEFCONFIG_LINK" "$SAVE_DIR/"
-	cp "$RK_CONFIG" "$SAVE_DIR/build_info"
+	ln -sf .config "$SAVE_DIR/build_info"
 
 	echo "Saving build logs..."
 	cp -rp "$RK_LOG_BASE_DIR" "$SAVE_DIR/"
@@ -137,7 +138,7 @@ usage_hook()
 
 clean_hook()
 {
-	rm -rf "$RK_OUTDIR"/$BOARD*
+	rm -rf "$RK_OUTDIR" "$RK_OUTDIR"/$BOARD*
 }
 
 BUILD_CMDS="all allsave"

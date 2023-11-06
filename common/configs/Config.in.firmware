@@ -9,44 +9,54 @@ config RK_PARAMETER
 	help
 	  Name of parameter file under <CHIP_DIR>/.
 
-if !RK_RTOS
+if RK_KERNEL_CFG != ""
+
+config RK_MISC
+	bool "pack misc image (for recovery, A/B, etc.)"
+	default y if RK_RECOVERY_CFG != ""
+
+if RK_MISC
 
 choice
-	prompt "package-file"
+	prompt "misc image"
 
-config RK_PACKAGE_FILE_DEFAULT
-	bool "auto"
+config RK_MISC_BLANK
+	bool "blank"
 	help
-	  Auto-generated.
+	  Use blank misc.
 
-config RK_PACKAGE_FILE_CUSTOM
+config RK_MISC_RECOVERY
+	bool "recovery"
+	help
+	  Use misc for recovery.
+
+config RK_MISC_CUSTOM
 	bool "custom"
 	help
-	  Use custom package-file under <CHIP_DIR>/.
+	  Use custom misc image under <CHIP_DIR>/.
 
-endchoice # package-file
+endchoice # misc image
 
-if RK_PACKAGE_FILE_CUSTOM
+if RK_MISC_RECOVERY
 
-config RK_PACKAGE_FILE
-	string "custom package-file"
-	default "package-file"
+config RK_MISC_RECOVERY_ARG
+	string "recovery arg in misc image"
+	default "--wipe_all"
 	help
-	  Name of custom package-file under <CHIP_DIR>/.
+	  Arg of recovery program.
 
 endif
 
+if RK_MISC_CUSTOM
+
 config RK_MISC_IMG
-	string "misc image"
-	default "blank-misc.img" if RK_AB_UPDATE
-	default "wipe_all-misc.img"
+	string "custom misc image"
+	default "misc.img"
 	help
-	  Name of misc image under <RK_IMAGE_DIR>/.
-	  Set "" for no misc.
+	  Name of misc image under <CHIP_DIR>/.
 
-endif # !RK_RTOS
-
-if RK_KERNEL_CFG != ""
+endif
+endif
 
 config RK_USE_FIT_IMG
 	bool "use FIT (Flattened Image Tree) image"

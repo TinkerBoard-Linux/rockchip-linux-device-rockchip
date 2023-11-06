@@ -103,36 +103,19 @@ install -m 0755 external/rkscript/usbdevice "$TARGET_DIR/usr/bin/"
 
 echo "Installing USB services..."
 
-if [ "$POST_INIT_SYSTEMD" ]; then
-	install -m 0755 external/rkscript/usbdevice.service \
-		"$TARGET_DIR/lib/systemd/system/"
-	mkdir -p "$TARGET_DIR/etc/systemd/system/sysinit.target.wants"
-	ln -sf /lib/systemd/system/usbdevice.service \
-		"$TARGET_DIR/etc/systemd/system/sysinit.target.wants/"
-fi
-
-if [ "$POST_INIT_SYSV" ]; then
-	install -m 0755 external/rkscript/S*usbdevice \
-		"$TARGET_DIR/etc/init.d/usbdevice.sh"
-	for level in 5 4 3 2; do
-		mkdir -p "$TARGET_DIR/etc/rc${level}.d"
-		ln -sf ../init.d/usbdevice.sh \
-			"$TARGET_DIR/etc/rc${level}.d/S70usbdevice.sh"
-	done
-	for level in 0 1 6; do
-		mkdir -p "$TARGET_DIR/etc/rc${level}.d"
-		ln -sf ../init.d/usbdevice.sh \
-			"$TARGET_DIR/etc/rc${level}.d/K30usbdevice.sh"
-	done
-fi
-
-if [ "$POST_INIT_BUSYBOX" ]; then
-	install -m 0755 external/rkscript/S*usbdevice "$TARGET_DIR/etc/init.d/"
-fi
+install_sysv_service external/rkscript/S*usbdevice.sh 5 4 3 2 K01 0 1 6
+install_busybox_service external/rkscript/S*usbdevice.sh
+install_systemd_service external/rkscript/usbdevice.service
 
 mkdir -p "$TARGET_DIR/etc/usbdevice.d"
 for hook in $RK_USB_HOOKS; do
-	[ -r "$hook" ] || continue
+	if [ -r "$CHIP_DIR/$hook" ]; then
+		hook="$CHIP_DIR/$hook"
+	elif [ ! -r "$hook" ]; then
+		echo "Ignore non-existant USB hook: $hook"
+		continue
+	fi
+
 	echo "Installing USB hook: $hook"
 	install -m 0644 "$hook" "$TARGET_DIR/etc/usbdevice.d/"
 done

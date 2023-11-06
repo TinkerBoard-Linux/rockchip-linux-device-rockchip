@@ -20,8 +20,11 @@ usage()
 
 	# Global options
 	echo -e "cleanall                          \tcleanup"
+	echo -e "clean[:module[:module]]...        \tcleanup modules"
+	echo "    available modules:"
+	grep -wl clean_hook "$SCRIPTS_DIR"/mk-*.sh | \
+		sed "s/^.*mk-\(.*\).sh/\t\1/"
 	echo -e "post-rootfs <rootfs dir>          \ttrigger post-rootfs hook scripts"
-	echo -e "shell                             \tsetup a shell for developing"
 	echo -e "help                              \tusage"
 	echo ""
 	echo "Default option is 'allsave'."
@@ -132,10 +135,10 @@ get_toolchain()
 			TOOLCHAIN_VENDOR=rockchip
 		fi
 
-		TOOLCHAIN_DIR="$(realpath prebuilts/gcc/*/$TOOLCHAIN_ARCH)"
-		GCC="$(find "$TOOLCHAIN_DIR" \
-			-name "*$TOOLCHAIN_VENDOR-$TOOLCHAIN_OS-*-gcc" | \
-			head -n 1)"
+		TOOLCHAIN_DIR="$(realpath \
+			$SDK_DIR/prebuilts/gcc/*/$TOOLCHAIN_ARCH)"
+		GCC="$(find "$TOOLCHAIN_DIR"/*/bin -name "*gcc" 2>/dev/null | \
+			grep -m 1 "$TOOLCHAIN_VENDOR-$TOOLCHAIN_OS-[^-]*-gcc")"
 		if [ ! -x "$GCC" ]; then
 			echo "No prebuilt GCC toolchain!"
 			exit 1
@@ -318,28 +321,72 @@ main()
 
 	# For Makefile
 	case "$@" in
-		make-targets | make-usage)
+		make-targets)
+			# Chip targets
+			ls "$CHIPS_DIR"
+			;&
+		make-usage)
 			run_build_hooks "$@"
 			rm -f "$INITIAL_ENV"
 			exit 0 ;;
 	esac
+
+	# Log SDK information
+	MANIFEST="$SDK_DIR/.repo/manifest.xml"
+	if [ -e "$MANIFEST" ]; then
+		if [ ! -L "$MANIFEST" ]; then
+			MANIFEST="$SDK_DIR/.repo/manifests/$(grep -o "[^\"]*\.xml" "$MANIFEST")"
+		fi
+		TAG="$(grep -o "linux-.*-gen-rkr[^.\"]*" "$MANIFEST" | \
+			head -n 1 || true)"
+		MANIFEST="$(basename "$(realpath "$MANIFEST")")"
+		echo
+		echo -e "\e[35m############### Rockchip Linux SDK ###############\e[0m"
+		echo
+		echo -e "\e[35mManifest: $MANIFEST\e[0m"
+		if [ "$TAG" ]; then
+			echo -e "\e[35mVersion: $TAG\e[0m"
+		fi
+		echo
+	fi
 
 	# Prepare firmware dirs
 	mkdir -p "$RK_FIRMWARE_DIR" "$RK_SECURITY_FIRMWARE_DIR"
 
 	cd "$SDK_DIR"
 	[ -f README.md ] || ln -rsf "$COMMON_DIR/README.md" .
+	[ -d common ] || ln -rsf "$COMMON_DIR" .
 
 	# TODO: Remove it in the repo manifest.xml
 	rm -f envsetup.sh
 
-	OPTIONS="${@:-allsave}"
+	OPTIONS=${@:-allsave}
+
+	# Special handle for chip and defconfig
+	# e.g. ./build.sh rk3588:rockchip_defconfig
+	for opt in $OPTIONS; do
+		if [ -d "$CHIPS_DIR/${opt%%:*}" ]; then
+			OPTIONS=$(echo "$OPTIONS" | xargs -n 1 | \
+				sed "s/^$opt$/chip:$opt/" | xargs)
+		elif echo "$opt" | grep -q "^[0-9a-z_]*_defconfig$"; then
+			OPTIONS=$(echo "$OPTIONS" | xargs -n 1 | \
+				sed "s/^$opt$/defconfig:$opt/" | xargs)
+		fi
+	done
 
 	# Options checking
 	CMDS="$(run_build_hooks support-cmds all | xargs)"
 	for opt in $OPTIONS; do
 		case "$opt" in
 			help | h | -h | --help | usage | \?) usage ;;
+			clean:*)
+				# Check cleanup modules
+				for m in $(echo ${opt#clean:} | tr ':' ' '); do
+					grep -wq clean_hook \
+						"$SCRIPTS_DIR/mk-$m.sh" \
+						2>/dev/null || usage
+				done
+				;&
 			shell | cleanall)
 				# Check single options
 				if [ "$opt" = "$OPTIONS" ]; then
@@ -398,7 +445,7 @@ main()
 
 	# No need to go further
 	CMDS="$(run_build_hooks support-cmds pre-build build \
-		post-build | xargs) shell cleanall post-rootfs"
+		post-build | xargs) cleanall clean post-rootfs"
 	option_check "$CMDS" $OPTIONS || return 0
 
 	# Force exporting config environments
@@ -467,30 +514,21 @@ main()
 	set +a
 
 	export PYTHON3=/usr/bin/python3
-
-	if [ "$RK_KERNEL_CFG" ]; then
-		export RK_KERNEL_TOOLCHAIN="$(get_toolchain "$RK_KERNEL_ARCH")"
-
-		CPUS=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
-		export KMAKE="make -C "$SDK_DIR/kernel/" -j$(( $CPUS + 1 )) \
-			CROSS_COMPILE=$RK_KERNEL_TOOLCHAIN ARCH=$RK_KERNEL_ARCH"
-
-		export RK_KERNEL_VERSION_REAL=$(kernel_version_real)
-	fi
+	export RK_KERNEL_VERSION_REAL=$(kernel_version_real)
 
 	# Handle special commands
 	case "$OPTIONS" in
-		shell)
-			echo -e "\e[35mDoing this is dangerous and for developing only.\e[0m"
-			# No error handling in develop shell.
-			set +e; trap ERR
-			/bin/bash
-			echo -e "\e[35mExit from $BASH_SOURCE shell.\e[0m"
-			exit 0 ;;
 		cleanall)
 			run_build_hooks clean
 			rm -rf "$RK_OUTDIR" "$SDK_DIR/rockdev"
 			finish_build cleanall
+			exit 0 ;;
+		clean:*)
+			MODULES="$(echo ${OPTIONS#clean:} | tr ':' ' ')"
+			for m in $MODULES; do
+				"$SCRIPTS_DIR/mk-$m.sh" clean
+			done
+			finish_build clean - $MODULES
 			exit 0 ;;
 		post-rootfs)
 			shift

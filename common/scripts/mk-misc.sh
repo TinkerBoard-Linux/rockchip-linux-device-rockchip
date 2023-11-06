@@ -1,28 +1,23 @@
 #!/bin/bash -e
 
-INPUT=$1
-OUTPUT=$2
-SIZE=$3
-BUF=$4
+MISC_IMG="$(realpath "${1:-misc.img}")"
+[ -z "$1" ] || shift
+COMMAND="$1"
+[ -z "$1" ] || shift
+ARGS="$@"
 
-if [ ! -e "$INPUT" ]; then
-	echo "ERROR: No input file \"$INPUT\""
-	exit 1
-fi
+rm -rf "$MISC_IMG"
+# The old windows tools don't accept misc > 64K
+truncate -s 48k "$MISC_IMG"
 
-if [ "$SIZE" -gt 1024 ]; then
-	echo "ERROR: SIZE bigger than 1K"
-	exit 1
-fi
-
-BIG_END=$[SIZE / 256]
-LIT_END=$[SIZE - (BIG_END * 256)]
-BIG_END=$(echo "ibase=10;obase=16;$BIG_END" | bc)
-LIT_END=$(echo "ibase=10;obase=16;$LIT_END" | bc)
-
-rm -rf "$OUTPUT"
-dd if="$INPUT" of="$OUTPUT" bs=1k count=10
-echo -en "\x$LIT_END\x$BIG_END" >> "$OUTPUT"
-echo -n "$BUF" >> "$OUTPUT"
-SKIP=$[10 * 1024 + SIZE + 2]
-dd if="$INPUT" of="$OUTPUT" seek=$SKIP skip=$SKIP bs=1
+case "$COMMAND" in
+	"") echo -e "Generated blank misc image:\n$MISC_IMG" ;;
+	recovery)
+		echo -n "boot-recovery" | \
+			dd of="$MISC_IMG" bs=1 seek=$((16*1024)) conv=notrunc
+		echo -e -n "$COMMAND\n$ARGS" | \
+			dd of="$MISC_IMG" bs=1 seek=$((16*1024+64)) conv=notrunc
+		echo -e "Generated misc image for \"$COMMAND $ARGS\":\n$MISC_IMG"
+		;;
+	*) echo "Unsupported command: $COMMAND $ARGS!" ;;
+esac

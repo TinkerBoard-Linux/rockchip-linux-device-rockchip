@@ -34,7 +34,11 @@ build_yocto()
 	rm -f build/conf/local.conf
 
 	if echo "$RK_YOCTO_CFG" | grep -q ".conf$"; then
-		ln -sf $RK_YOCTO_CFG build/conf/local.conf
+		if [ ! -r "$RK_YOCTO_CFG" ]; then
+			RK_YOCTO_CFG="build/conf/$RK_YOCTO_CFG"
+		fi
+
+		ln -rsf "$RK_YOCTO_CFG" build/conf/local.conf
 
 		echo "=========================================="
 		echo "          Start building $RK_YOCTO_CFG"
@@ -49,6 +53,9 @@ build_yocto()
 
 			echo
 			echo "MACHINE = \"$RK_YOCTO_CFG\""
+			if [ "$RK_CHIP" = "rk3288w" ]; then
+				echo "MACHINE_FEATURES:append = \" rk3288w\""
+			fi
 			echo
 		} > build/conf/local.conf
 
@@ -132,7 +139,7 @@ build_debian()
 usage_hook()
 {
 	echo -e "buildroot-config[:<config>]       \tmodify buildroot defconfig"
-	echo -e "buildroot-make[:<arg1>:<arg2>]    \trun buildroot make"
+	echo -e "buildroot-make[:<arg1>:<arg2>]    \trun buildroot make (alias bmake)"
 	echo -e "rootfs[:<rootfs type>]            \tbuild default rootfs"
 	echo -e "buildroot                         \tbuild buildroot rootfs"
 	echo -e "yocto                             \tbuild yocto rootfs"
