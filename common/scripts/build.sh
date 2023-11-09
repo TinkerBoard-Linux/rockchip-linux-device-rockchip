@@ -310,6 +310,8 @@ main()
 
 	if [ ! $VERSION_NUMBER ]; then
 		VERSION_NUMBER="eng-$USER"
+	else
+		VERSION_NUMBER="v$VERSION_NUMBER"
 	fi
 	VERSION_NUMBER="$VERSION_NUMBER-$(date +%Y%m%d)"
 
@@ -456,9 +458,9 @@ main()
 	cp "$RK_CONFIG" "$RK_LOG_DIR"
 
 	if [ "$RK_ROOTFS_SYSTEM" = "debian" ];then
-		PROJECT_NAME="$RK_PROJECT_NAME-Debian-Bullseye-v"
+		PROJECT_NAME="$RK_PROJECT_NAME-Debian-Bullseye-"
 	elif [ "$RK_ROOTFS_SYSTEM" = "yocto" ];then
-		PROJECT_NAME="$RK_PROJECT_NAME-Yocto-Kirkstone-v"
+		PROJECT_NAME="$RK_PROJECT_NAME-Yocto-Kirkstone-"
 		export IMAGE_VERSION="$VERSION_NUMBER"
 	fi
 
