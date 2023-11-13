@@ -118,7 +118,12 @@ build_debian()
 	echo "=========================================="
 
 	cd debian
-	ROOTFS_BASE_DIR="../rootfs-base"
+
+  ROOTFS_BASE_DIR="../rootfs-base"
+  if [ ! -e $ROOTFS_BASE_DIR ]; then
+    ROOTFS_BASE_DIR="."
+  fi
+
 	if [ ! -f linaro-$RK_DEBIAN_VERSION-$ARCH.tar.gz ]; then
 		RELEASE=$RK_DEBIAN_VERSION TARGET=desktop ARCH=$ARCH \
 			./mk-base-debian.sh
