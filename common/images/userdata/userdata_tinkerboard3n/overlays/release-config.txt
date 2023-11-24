@@ -50,4 +50,5 @@ g52_maxfreq=800000000
 #overlay=edp_G156HAB02
 #overlay=asus_pwm_capture
 #overlay=rk809_factory_use
+#overlay=mipi2lvds2_G101EAN02
 overlay=
