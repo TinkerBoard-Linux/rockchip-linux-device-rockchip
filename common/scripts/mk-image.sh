@@ -21,12 +21,12 @@ usage()
     fatal "Usage: $0 <src_dir> <target_image> <fs_type> <size(M|K)|auto(0)> [label]"
 }
 
-[ ! $# -lt 4 ] || usage "Not enough args${@+: $0 $@}"
+[ ! $# -lt 3 ] || usage "Not enough args${@+: $0 $@}"
 
 export SRC_DIR=$1
 export TARGET=$2
 FS_TYPE=$3
-SIZE=$4
+SIZE=${4:-0}
 LABEL=$5
 
 case $SIZE in
@@ -35,6 +35,9 @@ case $SIZE in
         ;;
     *K)
         SIZE_KB=$(( ${SIZE%K} ))
+        ;;
+    *G)
+        SIZE_KB=$(( ${SIZE%G} * 1024 * 1024 ))
         ;;
     *)
         SIZE_KB=$(( ${SIZE%M} * 1024 )) # default is MB
@@ -55,8 +58,8 @@ copy_to_ntfs()
             || break
         find $SRC_DIR -maxdepth $DEPTH -mindepth $DEPTH -type d \
             -exec sh -c 'ntfscp $TARGET "$1" "${1#$SRC_DIR}"' sh {} \; || \
-	    fatal "Detected non-buildroot ntfscp(doesn't support dir copy)"
-        DEPTH=$(($DEPTH + 1))
+            fatal "Detected non-buildroot ntfscp(doesn't support dir copy)"
+                    DEPTH=$(($DEPTH + 1))
     done
 
     find $SRC_DIR -type f \
@@ -90,28 +93,31 @@ mkimage()
 {
     echo "Making $TARGET from $SRC_DIR with size(${SIZE_KB}KB)"
     rm -rf $TARGET
-    dd of=$TARGET bs=1K seek=$SIZE_KB count=0 &>/dev/null || \
-        fatal "Failed to dd image!"
+
     case $FS_TYPE in
         ext[234])
             if mke2fs -h 2>&1 | grep -wq "\-d"; then
-                mke2fs -t $FS_TYPE $TARGET -d $SRC_DIR \
+                mke2fs -t $FS_TYPE $TARGET -d $SRC_DIR ${SIZE_KB}K \
                     || return 1
             else
                 echo "Detected old mke2fs(doesn't support '-d' option)!"
-                mke2fs -t $FS_TYPE $TARGET || return 1
+                mke2fs -t $FS_TYPE $TARGET ${SIZE_KB}K || return 1
                 copy_to_image || return 1
             fi
             # Set max-mount-counts to 0, and disable the time-dependent checking.
             tune2fs -c 0 -i 0 $TARGET ${LABEL:+-L $LABEL}
             ;;
         msdos|fat|vfat)
+            truncate -s ${SIZE_KB}K $TARGET
+
             # Use fat32 by default
             mkfs.vfat -F 32 $TARGET ${LABEL:+-n $LABEL} && \
                 MTOOLS_SKIP_CHECK=1 \
                 mcopy -bspmn -D s -i $TARGET $SRC_DIR/* ::/
             ;;
         ntfs)
+            truncate -s ${SIZE_KB}K $TARGET
+
             # Enable compression
             mkntfs -FCQ $TARGET ${LABEL:+-L $LABEL}
             if check_host_tool ntfscp; then
@@ -120,9 +126,7 @@ mkimage()
                 copy_to_image
             fi
             ;;
-        ubi|ubifs)
-            mk_ubi_image
-            ;;
+        ubi|ubifs) mk_ubi_image ;;
     esac
 }
 
@@ -159,11 +163,10 @@ mk_ubi_image()
 
     UBIFS_LEBSIZE=$(( $UBI_BLOCK_SIZE - 2 * $UBI_PAGE_SIZE ))
     UBIFS_MINIOSIZE=$UBI_PAGE_SIZE
+    UBIFS_MAXLEBCNT=$(( $SIZE_KB * 1024 / $UBIFS_LEBSIZE ))
 
     UBIFS_IMAGE="$TARGET_DIR/$UBI_VOL_NAME.ubifs"
     UBINIZE_CFG="$TARGET_DIR/${UBI_VOL_NAME}-ubinize.cfg"
-
-    UBIFS_MAXLEBCNT=$(( $SIZE_KB * 1024 / $UBIFS_LEBSIZE ))
 
     mkfs.ubifs -x lzo -e $UBIFS_LEBSIZE -m $UBIFS_MINIOSIZE \
         -c $UBIFS_MAXLEBCNT -d $SRC_DIR -F -v -o $UBIFS_IMAGE || return 1
@@ -173,7 +176,6 @@ mk_ubi_image()
     echo "vol_id=0" >> $UBINIZE_CFG
     echo "vol_type=dynamic" >> $UBINIZE_CFG
     echo "vol_name=$UBI_VOL_NAME" >> $UBINIZE_CFG
-    echo "vol_size=${SIZE_KB}KiB" >> $UBINIZE_CFG
     echo "vol_alignment=1" >> $UBINIZE_CFG
     echo "vol_flags=autoresize" >> $UBINIZE_CFG
     echo "image=$UBIFS_IMAGE" >> $UBINIZE_CFG

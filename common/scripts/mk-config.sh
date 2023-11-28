@@ -22,7 +22,6 @@ switch_defconfig()
 	ln -rsf "$(dirname "$DEFCONFIG")" "$CHIP_DIR"
 
 	$MAKE $(basename "$DEFCONFIG")
-	exit 0
 }
 
 rockchip_defconfigs()
@@ -96,6 +95,7 @@ choose_chip()
 			;;
 	esac
 
+	echo "Switching to chip: $CHIP"
 	rm -rf "$CHIP_DIR"
 	ln -rsf "$CHIPS_DIR/$CHIP" "$CHIP_DIR"
 
@@ -158,7 +158,7 @@ usage_hook()
 	echo -e "defconfig[:<config>]              \tchoose defconfig"
 	echo -e " *_defconfig                      \tswitch to specified defconfig"
 	echo "    available defconfigs:"
-	echo "$(ls "$CHIP_DIR/" | grep "defconfig$" | sed "s/^/\t/")"
+	ls "$CHIP_DIR/" | grep "defconfig$" | sed "s/^/\t/"
 	echo -e " olddefconfig                     \tresolve any unresolved symbols in .config"
 	echo -e " savedefconfig                    \tsave current config to defconfig"
 	echo -e " menuconfig                       \tinteractive curses-based configurator"
@@ -167,7 +167,7 @@ usage_hook()
 
 clean_hook()
 {
-	$MAKE distclean
+	rm -rf "$RK_OUTDIR"/*config* "$RK_OUTDIR/kconf"
 }
 
 INIT_CMDS="chip defconfig lunch .*_defconfig olddefconfig savedefconfig menuconfig config default"
@@ -177,8 +177,12 @@ init_hook()
 		chip) shift; choose_chip $@ ;;
 		lunch|defconfig) shift; choose_defconfig $@ ;;
 		*_defconfig) switch_defconfig "$1" ;;
-		olddefconfig | savedefconfig | menuconfig) $MAKE $1 ;;
+		olddefconfig | savedefconfig | menuconfig)
+			prepare_config
+			$MAKE $1
+			;;
 		config)
+			prepare_config
 			$MAKE menuconfig
 			$MAKE savedefconfig
 			;;

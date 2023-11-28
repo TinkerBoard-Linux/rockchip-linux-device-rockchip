@@ -4,7 +4,6 @@ menu "Loader (u-boot)"
 
 config RK_UBOOT_CFG
 	string "u-boot defconfig"
-	default RK_RTOS_UBOOT_CFG if RK_RTOS_UBOOT_CFG != ""
 	default "rk1808" if RK_CHIP_FAMILY = "rk1806"
 	default "evb-px3se" if RK_CHIP_FAMILY = "px3se"
 	default "rk3126" if RK_CHIP = "rk3126c"
@@ -13,7 +12,7 @@ config RK_UBOOT_CFG
 	default "evb-px30" if RK_CHIP_FAMILY = "rk3358"
 	default "rv1126" if RK_CHIP_FAMILY = "rv1126_rv1109"
 	default RK_CHIP_FAMILY if RK_CHIP_FAMILY = "rk3308" || \
-		RK_CHIP_FAMILY = "rk3588"
+		RK_CHIP_FAMILY = "rk3288" || RK_CHIP_FAMILY = "rk3588"
 	default RK_CHIP
 
 if RK_UBOOT_CFG != ""
@@ -54,6 +53,8 @@ config RK_UBOOT_ARCH
 
 choice
 	prompt "u-boot arch"
+	default RK_UBOOT_ARM32 if RK_KERNEL_ARM32
+	default RK_UBOOT_ARM32 if RK_RTOS_ARM32
 
 config RK_UBOOT_ARM64
 	bool "arm64"

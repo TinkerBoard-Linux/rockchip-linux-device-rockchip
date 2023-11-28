@@ -33,7 +33,7 @@ build_uboot()
 		${RK_UBOOT_INI:+../rkbin/RKBOOT/$RK_UBOOT_INI} \
 		${RK_UBOOT_TRUST_INI:+../rkbin/RKTRUST/$RK_UBOOT_TRUST_INI}"
 	UARGS="$UARGS_COMMON ${RK_UBOOT_SPL:+--spl-new} \
-		${RK_SECURITY_OTP_DEBUG:+--burn-key-hash}"
+		${RK_SECURITY_BURN_KEY:+--burn-key-hash}"
 
 	if [ "$RK_SECURITY" ]; then
 		for IMAGE in ${1:-boot.img ${RK_RECOVERY_CFG:+recovery.img}}; do
@@ -97,11 +97,14 @@ clean_hook()
 BUILD_CMDS="loader uboot uefi"
 build_hook()
 {
-	if [ "$RK_RTOS" ]; then
-		RK_UBOOT_TOOLCHAIN="$(get_toolchain "$RK_RTOS_ARCH" arm none)"
-	else
-		RK_UBOOT_TOOLCHAIN="$(get_toolchain "$RK_UBOOT_ARCH")"
+	if echo $RK_UBOOT_CFG $RK_UBOOT_CFG_FRAGMENTS | grep -q aarch32 && \
+		[ "$RK_UBOOT_ARCH" = arm64 ]; then
+		echo -e "\e[31mWrong u-boot arch ($RK_UBOOT_ARCH) for config:" \
+			"$RK_UBOOT_CFG $RK_UBOOT_CFG_FRAGMENTS\n\e[0m"
+		export RK_UBOOT_ARCH=arm
 	fi
+
+	RK_UBOOT_TOOLCHAIN="$(get_toolchain "$RK_UBOOT_ARCH")"
 
 	echo "Toolchain for loader (u-boot):"
 	echo "${RK_UBOOT_TOOLCHAIN:-gcc}"
