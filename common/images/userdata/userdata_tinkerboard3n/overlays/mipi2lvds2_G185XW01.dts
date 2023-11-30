@@ -49,32 +49,32 @@
 				dsi,format = <0>;//MIPI_DSI_FMT_RGB888:
 				dsi,lanes = <4>;
 
-                		t1=<1>;//VCC on to start lvds signal
-                		t2=<500>;//t2-t6: LVDS signal(start) to turn Backlihgt on or Backlight sys Enable
-                		t3=<200>;//Backlight sys Disable or Backlihgt(off) to stop lvds signal
-                		t4=<1>;//LVDS signal to turn VCC off
-                		t5=<1000>;//VCC off to turn VCC on
-                		t6=<0>;//Backlight sys Enable to turn Backlight on
-                		t7=<0>;//Backlight off to Backlight sys Disable
-                		//t1 -> t2-t6 -> t6 -> t3 -> t7 -> t4 -> t5
+                t1=<1>;//VCC on to start lvds signal
+                t2=<500>;//t2-t6: LVDS signal(start) to turn Backlihgt on or Backlight sys Enable
+                t3=<200>;//Backlight sys Disable or Backlihgt(off) to stop lvds signal
+                t4=<1>;//LVDS signal to turn VCC off
+                t5=<1000>;//VCC off to turn VCC on
+                t6=<0>;//Backlight sys Enable to turn Backlight on
+                t7=<0>;//Backlight off to Backlight sys Disable
+                //t1 -> t2-t6 -> t6 -> t3 -> t7 -> t4 -> t5
 
 				disp_timings0: display-timings {
 					native-mode = <&dsi0_timing0>;
 
 					dsi0_timing0: timing0  {
-                        			clock-frequency = <78000000>;
-                        			hactive = <1366>;
-                        			vactive = <768>;
-                        			hfront-porch = <100>;
-                        			hback-porch = <100>;
-                        			hsync-len = <40>;
-                        			vfront-porch = <15>;
-                        			vsync-len = <10>;
-                        			vback-porch = <15>;
-                        			hsync-active = <0>;
-                        			vsync-active = <0>;
-                        			de-active = <1>;
-                       		 		pixelclk-active = <0>;
+                        clock-frequency = <78000000>;
+                        hactive = <1368>;
+                        vactive = <768>;
+                        hfront-porch = <100>;
+                        hback-porch = <100>;
+                        hsync-len = <40>;
+                        vfront-porch = <15>;
+                        vsync-len = <10>;
+                        vback-porch = <15>;
+                        hsync-active = <0>;
+                        vsync-active = <0>;
+                        de-active = <1>;
+                        pixelclk-active = <0>;
 					};
 				};
 			};

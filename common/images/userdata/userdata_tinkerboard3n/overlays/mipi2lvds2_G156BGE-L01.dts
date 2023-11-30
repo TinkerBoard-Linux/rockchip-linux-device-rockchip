@@ -64,19 +64,19 @@
 					native-mode = <&dsi0_timing0>;
 
 					dsi0_timing0: timing0  {
-                        			clock-frequency = <76000000>;
-                        			hactive = <1366>;
-                        			vactive = <768>;
-                        			hfront-porch = <80>;
-                        			hback-porch = <80>;
-                        			hsync-len = <34>;
-                        			vfront-porch = <15>;
-                        			vsync-len = <8>;
-                        			vback-porch = <15>;
-                        			hsync-active = <0>;
-                        			vsync-active = <0>;
-                        			de-active = <1>;
-                       		 		pixelclk-active = <0>;
+                        clock-frequency = <76000000>;
+                        hactive = <1368>;
+                        vactive = <768>;
+                        hfront-porch = <80>;
+                        hback-porch = <80>;
+                        hsync-len = <34>;
+                        vfront-porch = <15>;
+                        vsync-len = <8>;
+                        vback-porch = <15>;
+                        hsync-active = <0>;
+                        vsync-active = <0>;
+                        de-active = <1>;
+                        pixelclk-active = <0>;
 					};
 				};
 			};
