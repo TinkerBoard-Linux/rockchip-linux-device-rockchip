@@ -112,13 +112,16 @@ build_save()
         if [ "$VERSION" == "release" ]; then
                 mv $SAVE_DIR/IMAGES/sdcard_full.img $SAVE_DIR/$RELEASE_NAME.img
 		mv $SAVE_DIR/IMAGES/sdcard_uboot.img $SAVE_DIR/$RECOVERY_RELEASE_NAME.img 
+		cp $SAVE_DIR/IMAGES/update_uboot.img $SAVE_DIR/$RECOVERY_RELEASE_NAME-rktools.img
 		mv $SAVE_DIR/IMAGES/spinor_uboot.img $SAVE_DIR/$SPINOR_RECOVERY_RELEASE_NAME.img
                 zip -j -m -T $SAVE_DIR/$RELEASE_NAME.zip $SAVE_DIR/$RELEASE_NAME.img
                 zip -j -m -T $SAVE_DIR/$RECOVERY_RELEASE_NAME.zip $SAVE_DIR/$RECOVERY_RELEASE_NAME.img
+		zip -j -m -T $SAVE_DIR/$RECOVERY_RELEASE_NAME-rktools.zip $SAVE_DIR/$RECOVERY_RELEASE_NAME-rktools.img
 		zip -j -m -T $SAVE_DIR/$SPINOR_RECOVERY_RELEASE_NAME.zip $SAVE_DIR/$SPINOR_RECOVERY_RELEASE_NAME.img
 		cd $SAVE_DIR
                 sha256sum $RELEASE_NAME.zip > $RELEASE_NAME.zip.sha256sum
                 sha256sum $RECOVERY_RELEASE_NAME.zip > $RECOVERY_RELEASE_NAME.zip.sha256sum
+		sha256sum $RECOVERY_RELEASE_NAME-rktools.zip > $RECOVERY_RELEASE_NAME-rktools.zip.sha256sum
 		sha256sum $SPINOR_RECOVERY_RELEASE_NAME.zip > $SPINOR_RECOVERY_RELEASE_NAME.zip.sha256sum
 		cd -
         fi
