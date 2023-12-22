@@ -78,9 +78,11 @@ pack_extra_partitions() {
 		fi
 
 		if [ "$PART_NAME" = userdata ]; then
-			cp $OUTDIR/overlays/$CONFIGTXT $OUTDIR/config.txt
-			rm $OUTDIR/overlays/release-config.txt
-			rm $OUTDIR/overlays/factory-config.txt
+			if [ -f $OUTDIR/overlays/$CONFIGTXT ]; then
+				cp $OUTDIR/overlays/$CONFIGTXT $OUTDIR/config.txt
+				rm $OUTDIR/overlays/release-config.txt
+				rm $OUTDIR/overlays/factory-config.txt
+			fi
 
 			message "Auto build dtbo in $PART_NAME..."
 			rm -f $OUTDIR/overlays/*.dtbo
