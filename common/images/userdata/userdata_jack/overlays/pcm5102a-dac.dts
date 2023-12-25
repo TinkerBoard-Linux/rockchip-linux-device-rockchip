@@ -1,0 +1,48 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "rockchip,rk3568";
+
+	fragment@0 {
+		target-path = "/";
+		__overlay__ {
+			pcm5102a: pcm5102a {
+				#sound-dai-cells = <0>;
+				compatible = "ti,pcm5102a";
+				status = "okay";
+			};
+		};
+	};
+
+	fragment@1 {
+		target-path ="/i2s@fe430000";
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@2 {
+		target-path = "/sound-ext-card";
+		__overlay__ {
+			status = "okay";
+			compatible = "simple-audio-card";
+			simple-audio-card,format = "i2s";
+			simple-audio-card,name = "ti,pcm5102a";
+			simple-audio-card,mclk-fs = <256>;
+			simple-audio-card,cpu {
+					sound-dai = <&i2s3_2ch>;
+			};
+			simple-audio-card,codec {
+					sound-dai = <&pcm5102a>;
+			};
+		};
+	};
+
+        fragment@3 {
+                target-path ="/spdif@fe460000";
+                __overlay__ {
+                        status = "disabled";
+                };
+        };
+};

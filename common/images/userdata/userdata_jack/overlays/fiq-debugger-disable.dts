@@ -1,0 +1,30 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "rockchip,rk3568";
+
+        fragment@0 {
+                target-path ="/fiq-debugger";
+                __overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@1 {
+		target-path ="/pinctrl";
+
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&uart2_initgpio>;
+			
+			uart2initgpio {
+				uart2_initgpio: gpio-initgpio {
+					rockchip,pins = <0 24 0 &pcfg_pull_up>,
+							<0 25 0 &pcfg_pull_up>;
+				};
+			};
+		};
+	};
+
+};

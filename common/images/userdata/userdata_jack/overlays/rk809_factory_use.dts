@@ -1,0 +1,13 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "rockchip,rk3568";
+
+	fragment@0 {
+		target = <&rk809_codec>;
+		__overlay__ {
+			only-factory-use;
+		};
+	};
+};
