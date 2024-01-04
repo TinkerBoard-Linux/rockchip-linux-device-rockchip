@@ -212,7 +212,7 @@ done
 #fi
 
 if [ $TYPE = "uboot" ]; then
-	SDBOOTIMG="$BASEDIR/../../rockdev/sd_uboot.img"
+	SDBOOTIMG="$BASEDIR/../../../../rockdev/sd_uboot.img"
 fi
 echo $SDBOOTIMG
 
