@@ -568,7 +568,7 @@ main()
 	echo "VERSION_NUMBER: $VERSION_NUMBER"
 	echo "RELEASE_NAME: $RELEASE_NAME"
 
-	export LIB_MODULES_DIR=$SDK_DIR/debian/lib_modules
+	export LIB_MODULES_DIR=$RK_SDK_DIR/debian/lib_modules
 
 	if [ -z "$INITIAL_SESSION" ]; then
 		# Inherit session environments
