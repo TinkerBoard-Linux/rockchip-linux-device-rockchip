@@ -30,6 +30,22 @@ post_build_hook()
 
 		rk_extra_part_prepare $idx
 
+		if [ "$PART_NAME" = userdata ]; then
+			message "Auto build dtbo in $PART_NAME..."
+			rm -f $OUTDIR/overlays/*.dtbo
+
+			for file in $OUTDIR/overlays/*.dts
+			do
+				dts=${file##*/}
+				dtbo=${dts%.*}
+				if [ "$dts" = "*.dts"  ]; then
+					break
+				fi
+				dtc -@ -O dtb -o $OUTDIR/overlays/$dtbo.dtbo $OUTDIR/overlays/$dts
+			done
+			rm -f $OUTDIR/overlays/*.dts
+		fi
+
 		if rk_extra_part_builtin $idx; then
 			notice "Skip packing $PART_NAME (builtin)"
 			continue
