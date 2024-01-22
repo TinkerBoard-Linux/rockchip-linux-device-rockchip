@@ -137,7 +137,7 @@ build_updateimg()
 		do_build_updateimg
 	fi
 
-	sudo $SCRIPTS_DIR/sdboot.sh
+	sudo $RK_SCRIPTS_DIR/sdboot.sh
 
 	finish_build
 }
