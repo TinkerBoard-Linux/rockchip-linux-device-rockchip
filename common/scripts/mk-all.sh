@@ -49,7 +49,8 @@ build_release()
 	#	*) RELEASE_DIR="$RELEASE_BASE_DIR" ;;
 	#esac
 	#[ "$1" ] || RELEASE_DIR="$RELEASE_DIR/$(date  +%Y%m%d_%H%M%S)"
-
+	RELEASE_BASE_DIR=$RK_SDK_DIR/IMAGE
+	RELEASE_DIR=RELEASE_BASE_DIR/$RELEASE_NAME
 	rm -rf "$RELEASE_DIR"
 	mkdir -p "$RELEASE_DIR"
 	rm -rf "$RELEASE_BASE_DIR/latest"

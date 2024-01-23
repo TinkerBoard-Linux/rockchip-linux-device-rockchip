@@ -97,14 +97,14 @@ do_build_updateimg()
 
         # Prepare package-file
         if [ "$PKG_UBOOT_FILE" ]; then
-                PKG_UBOOT_FILE="$CHIP_DIR/$PKG_UBOOT_FILE"
+                PKG_UBOOT_FILE="$RK_CHIP_DIR/$PKG_UBOOT_FILE"
                 if [ ! -r "$PKG_UBOOT_FILE" ]; then
                         echo "$PKG_UBOOT_FILE not exists!"
                         exit 1
                 fi
                 ln -rsf "$PKG_UBOOT_FILE" package-file
 		mv  parameter.txt parameter.txt_full
-		cp -arp "$CHIP_DIR/$PARAMETER_UBOOT_FILE" parameter.txt
+		cp -arp "$RK_CHIP_DIR/$PARAMETER_UBOOT_FILE" parameter.txt
 	fi
 
         echo "Packing $TARGET_UBOOT for $TYPE..."
@@ -127,10 +127,10 @@ do_build_updateimg()
         ln -rsf "$IMAGE_DIR/update_uboot.img" "$TARGET_UBOOT"
 
         # Build the SD uboot boot format image
-        $SDK_DIR/rkbin/scripts/sdboot.sh -t uboot -d sdcard
+        $RK_SDK_DIR/rkbin/scripts/sdboot.sh -t uboot -d sdcard
 
         # Build the spi nor flash uboot boot format image
-        $SDK_DIR/rkbin/scripts/sdboot.sh -t uboot -d spinor
+        $RK_SDK_DIR/rkbin/scripts/sdboot.sh -t uboot -d spinor
 
 	rm -rf package-file
 	rm -rf parameter.txt
@@ -166,7 +166,7 @@ do_build_updateimg()
 	ln -rsf "$IMAGE_DIR/update.img" "$OUT_DIR"
 	ln -rsf "$IMAGE_DIR/update.img" "$TARGET"
 
-	$SDK_DIR/rkbin/scripts/sdboot.sh -t all -d sdcard
+	$RK_SDK_DIR/rkbin/scripts/sdboot.sh -t all -d sdcard
 
 	if echo "$TYPE" | grep -wq "ab"; then
 		ln -sf "$(basename "$TARGET")" \

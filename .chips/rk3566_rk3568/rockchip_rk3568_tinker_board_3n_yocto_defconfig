@@ -18,3 +18,4 @@ RK_EXTRA_PARTITION_1_DEV="userdata"
 RK_EXTRA_PARTITION_1_SRC="userdata_tinkerboard3n"
 RK_PROJECT_NAME="Tinker_Board_3N"
 RK_UBOOT_RAW=y
+RK_WIFIBT_CHIP=""
