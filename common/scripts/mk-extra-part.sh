@@ -1,5 +1,10 @@
 #!/bin/bash -e
 
+CONFIGTXT=release-config.txt
+if [ "$VERSION" == "factory" ]; then
+	CONFIGTXT=factory-config.txt
+fi
+
 # Hooks
 
 usage_hook()
@@ -38,6 +43,25 @@ post_build_hook()
 		if rk_extra_part_nopack $idx; then
 			notice "Skip packing $PART_NAME (not packing)"
 			continue
+		fi
+
+		if [ "$PART_NAME" = userdata ]; then
+			cp $OUTDIR/overlays/$CONFIGTXT $OUTDIR/config.txt
+			rm $OUTDIR/overlays/release-config.txt
+			rm $OUTDIR/overlays/factory-config.txt
+
+			message "Auto build dtbo in $PART_NAME..."
+			rm -f $OUTDIR/overlays/*.dtbo
+
+			for file in $OUTDIR/overlays/*.dts
+			do
+				dts=${file##*/}
+				dtbo=${dts%.*}
+				if [ "$dts" = "*.dts"  ]; then
+					break
+				fi
+				dtc -@ -O dtb -o $OUTDIR/overlays/$dtbo.dtbo $OUTDIR/overlays/$dts
+			done
 		fi
 
 		if [ "$SIZE" = max ]; then
