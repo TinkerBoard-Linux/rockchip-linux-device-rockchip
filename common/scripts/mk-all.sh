@@ -51,7 +51,7 @@ build_release()
 	#esac
 	#[ "$1" ] || RELEASE_DIR="$RELEASE_DIR/$(date  +%Y%m%d_%H%M%S)"
 	RELEASE_BASE_DIR=$RK_SDK_DIR/IMAGE
-	RELEASE_DIR=RELEASE_BASE_DIR/$RELEASE_NAME
+	RELEASE_DIR=$RELEASE_BASE_DIR/$RELEASE_NAME
 	rm -rf "$RELEASE_DIR"
 	mkdir -p "$RELEASE_DIR"
 	rm -rf "$RELEASE_BASE_DIR/latest"
@@ -95,15 +95,15 @@ build_release()
 	cp -rvp "$RK_LOG_BASE_DIR" "$RELEASE_DIR/"
 
         if [ "$VERSION" == "release" ]; then
-                mv $SAVE_DIR/IMAGES/sdcard_full.img $SAVE_DIR/$RELEASE_NAME.img
-		mv $SAVE_DIR/IMAGES/sdcard_uboot.img $SAVE_DIR/$RECOVERY_RELEASE_NAME.img 
-		cp $SAVE_DIR/IMAGES/update_uboot.img $SAVE_DIR/$RECOVERY_RELEASE_NAME-rktools.img
-		mv $SAVE_DIR/IMAGES/spinor_uboot.img $SAVE_DIR/$SPINOR_RECOVERY_RELEASE_NAME.img
-                zip -j -m -T $SAVE_DIR/$RELEASE_NAME.zip $SAVE_DIR/$RELEASE_NAME.img
-                zip -j -m -T $SAVE_DIR/$RECOVERY_RELEASE_NAME.zip $SAVE_DIR/$RECOVERY_RELEASE_NAME.img
-		zip -j -m -T $SAVE_DIR/$RECOVERY_RELEASE_NAME-rktools.zip $SAVE_DIR/$RECOVERY_RELEASE_NAME-rktools.img
-		zip -j -m -T $SAVE_DIR/$SPINOR_RECOVERY_RELEASE_NAME.zip $SAVE_DIR/$SPINOR_RECOVERY_RELEASE_NAME.img
-		cd $SAVE_DIR
+                mv $RELEASE_DIR/IMAGES/sdcard_full.img $RELEASE_DIR/$RELEASE_NAME.img
+		mv $RELEASE_DIR/IMAGES/sdcard_uboot.img $RELEASE_DIR/$RECOVERY_RELEASE_NAME.img 
+		cp $RELEASE_DIR/IMAGES/update_uboot.img $RELEASE_DIR/$RECOVERY_RELEASE_NAME-rktools.img
+		mv $RELEASE_DIR/IMAGES/spinor_uboot.img $RELEASE_DIR/$SPINOR_RECOVERY_RELEASE_NAME.img
+                zip -j -m -T $RELEASE_DIR/$RELEASE_NAME.zip $RELEASE_DIR/$RELEASE_NAME.img
+                zip -j -m -T $RELEASE_DIR/$RECOVERY_RELEASE_NAME.zip $RELEASE_DIR/$RECOVERY_RELEASE_NAME.img
+		zip -j -m -T $RELEASE_DIR/$RECOVERY_RELEASE_NAME-rktools.zip $RELEASE_DIR/$RECOVERY_RELEASE_NAME-rktools.img
+		zip -j -m -T $RELEASE_DIR/$SPINOR_RECOVERY_RELEASE_NAME.zip $RELEASE_DIR/$SPINOR_RECOVERY_RELEASE_NAME.img
+		cd $RELEASE_DIR
                 sha256sum $RELEASE_NAME.zip > $RELEASE_NAME.zip.sha256sum
                 sha256sum $RECOVERY_RELEASE_NAME.zip > $RECOVERY_RELEASE_NAME.zip.sha256sum
 		sha256sum $RECOVERY_RELEASE_NAME-rktools.zip > $RECOVERY_RELEASE_NAME-rktools.zip.sha256sum
