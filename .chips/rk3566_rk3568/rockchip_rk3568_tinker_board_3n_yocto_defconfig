@@ -1,4 +1,5 @@
-RK_YOCTO_CFG="rockchip-rk3568-tinker_board_3n"
+RK_YOCTO_CFG="rockchip-rk3568-tinker_board_3n.conf"
+RK_YOCTO_CFG_CUSTOM=y
 RK_KERNEL_DTS_NAME="rk3568-tinker_board_3n"
 RK_USE_FIT_IMG=y
 RK_WIFIBT_TTY="ttyS8"
