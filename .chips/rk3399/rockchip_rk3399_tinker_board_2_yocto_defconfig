@@ -1,4 +1,5 @@
-RK_YOCTO_CFG="rockchip-rk3399-tinker_board_2"
+RK_YOCTO_CFG="rockchip-rk3399-tinker_board_2.conf"
+RK_YOCTO_CFG_CUSTOM=y
 RK_KERNEL_DTS_NAME="rk3399-tinker_board_2"
 RK_PARAMETER="parameter-tinkerboard2.txt"
 RK_ROOTFS_SYSTEM_YOCTO=y
