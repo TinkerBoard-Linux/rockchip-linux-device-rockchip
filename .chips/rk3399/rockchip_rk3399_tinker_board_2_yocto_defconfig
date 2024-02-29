@@ -12,3 +12,5 @@ RK_PACKAGE_FILE="tinker_board_2-package-file"
 RK_MISC_IMG="blank-misc.img"
 RK_PROJECT_NAME="Tinker_Board_2"
 RK_ROOTFS_OVERLAY=n
+RK_WIFIBT_CHIP=""
+RK_DISK_HELPERS_DISABLED=y
