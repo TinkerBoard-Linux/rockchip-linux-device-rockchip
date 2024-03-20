@@ -381,6 +381,8 @@ main()
                 export VERSION_NUMBER="$VERSION_NUMBER-factory"
 	elif [ "$VERSION" == "release" ]; then
                 export VERSION_NUMBER="$VERSION_NUMBER-release"
+	elif [ "$VERSION" == "sdflash" ]; then
+		export VERSION_NUMBER="$VERSION_NUMBER-sdflash"
 	fi
 
 	# For Makefile

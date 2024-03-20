@@ -109,7 +109,13 @@ build_release()
 		sha256sum $RECOVERY_RELEASE_NAME-rktools.zip > $RECOVERY_RELEASE_NAME-rktools.zip.sha256sum
 		sha256sum $SPINOR_RECOVERY_RELEASE_NAME.zip > $SPINOR_RECOVERY_RELEASE_NAME.zip.sha256sum
 		cd -
-        fi
+	elif [ "$VERSION" == "sdflash" ]; then
+		mv $RELEASE_DIR/IMAGES/sdcard_full.img $RELEASE_DIR/$RELEASE_NAME.img
+		zip -j -m -T $RELEASE_DIR/$RELEASE_NAME.zip $RELEASE_DIR/$RELEASE_NAME.img
+		cd $RELEASE_DIR
+		sha256sum $RELEASE_NAME.zip > $RELEASE_NAME.zip.sha256sum
+		cd -
+	fi
 
 	finish_build
 }
