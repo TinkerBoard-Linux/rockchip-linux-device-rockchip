@@ -58,6 +58,13 @@ config RK_MISC_IMG
 endif
 endif
 
+config RK_SPLASH_IMG
+	string "splash image"
+	default "blank-splash.img"
+	help
+	  Name of splash image under <RK_IMAGE_DIR>/.
+	  Set "" for no splash.
+
 config RK_USE_FIT_IMG
 	bool "use FIT (Flattened Image Tree) image"
 
