@@ -382,7 +382,7 @@ main()
 	elif [ "$VERSION" == "release" ]; then
                 export VERSION_NUMBER="$VERSION_NUMBER-release"
 	elif [ "$VERSION" == "sdflash" ]; then
-		export VERSION_NUMBER="$VERSION_NUMBER-sdflash"
+		export VERSION_NUMBER="$VERSION_NUMBER"
 	fi
 
 	# For Makefile
@@ -565,6 +565,9 @@ main()
                 PROJECT_NAME="$RK_PROJECT_NAME-Debian-Bullseye"
         elif [ "$RK_ROOTFS_SYSTEM" = "yocto" ];then
                 PROJECT_NAME="$RK_PROJECT_NAME-Yocto-Kirkstone"
+                export IMAGE_VERSION="$VERSION_NUMBER"
+        elif [ "$RK_ROOTFS_SYSTEM" = "buildroot" ];then
+                PROJECT_NAME="$RK_PROJECT_NAME-On_Device_Flash_Software"
                 export IMAGE_VERSION="$VERSION_NUMBER"
         fi
 

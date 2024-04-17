@@ -4,6 +4,15 @@ build_buildroot()
 {
 	check_config RK_BUILDROOT || false
 
+	cp -rf $LIB_MODULES_DIR/lib buildroot/board/rockchip/rk3566_rk3568/fs-overlay/usr/
+
+	if [ ! $VERSION_NUMBER ]; then
+        	VERSION_NUMBER="eng"
+	else
+                echo $VERSION_NUMBER > buildroot/board/rockchip/rk3566_rk3568/fs-overlay/etc/version
+	fi
+
+
 	IMAGE_DIR="${1:-$RK_OUTDIR/buildroot}"
 
 	BUILDROOT_VERSION=$(grep "export BR2_VERSION := " \

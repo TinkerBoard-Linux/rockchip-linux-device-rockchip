@@ -95,6 +95,8 @@ do_build()
 		modules)
                         if [ -e $LIB_MODULES_DIR ]; then
                                 rm -rf $LIB_MODULES_DIR
+				rm -rf $RK_SDK_DIR/yocto/meta-asus/asus-overlay/overlay/lib/modules
+				rm -rf $RK_SDK_DIR/buildroot/board/rockchip/rk3399/fs-overlay/usr/lib/modules
                         fi
                         mkdir -p $LIB_MODULES_DIR
 
