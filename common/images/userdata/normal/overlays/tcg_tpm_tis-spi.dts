@@ -1,0 +1,22 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "rockchip,spidev";
+
+	fragment@0 {
+		target = <&spi5>;
+		__overlay__ {
+			status = "okay";
+			max-freq = <48000000>;   //spi internal clk, don't modify
+			pinctrl-names = "default";
+			pinctrl-0 = <&spi5_clk &spi5_tx &spi5_rx &spi5_cs0>;
+			spidev: tpm@0 {
+				compatible = "tcg,tpm_tis-spi";
+				reg = <0>;   //chip select  0:cs0  1:cs1
+				id = <0>;
+				spi-max-frequency = <48000000>;
+			};
+		};
+	};
+};
