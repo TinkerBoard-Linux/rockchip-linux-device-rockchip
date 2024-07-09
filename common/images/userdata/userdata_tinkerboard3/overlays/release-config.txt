@@ -1,22 +1,23 @@
 ##### Hardware Interface Config #####
 
 ## Note: When there is any PIN conflict, enable the latter setting.  ##
-## | PIN | ALT Fun 1 | ALT Fun 2 | ##
-## |   8 |      pwm2 |     uart0 | ##
-## |  10 |      pwm1 |     uart0 | ##
-## |  11 |     pwm14 |      spi3 | ##
-## |  13 |     pwm15 |      spi3 | ##
-## |  15 |     pwm12 |      spi3 | ##
-## |  16 |      pwm0 |     uart0 | ##
-## |  18 |      pwm5 |     uart0 | ##
-## |  22 |     pwm15 | spdif_8ch | ##
-## |  29 |     pwm13 |      spi3 | ##
-## |  32 |      pwm9 |     uart4 | ##
-## |  33 |      pwm8 |     uart4 | ##
+## | PIN | ALT Fun 1 | ALT Fun 2 | ALT Fun 3 | ##
+## |   8 |      pwm2 |     uart0 |           | ##
+## |  10 |      pwm1 |     uart0 |           | ##
+## |  11 |     pwm14 |      spi3 |           | ##
+## |  13 |     pwm15 |      spi3 |           | ##
+## |  15 |     pwm12 |      spi3 |     uart9 | ##
+## |  16 |      pwm0 |     uart0 |           | ##
+## |  18 |      pwm5 |     uart0 |           | ##
+## |  22 |     pwm15 | spdif_8ch |           | ##
+## |  29 |     pwm13 |      spi3 |     uart9 | ##
+## |  32 |      pwm9 |     uart4 |           | ##
+## |  33 |      pwm8 |     uart4 |           | ##
 
 #intf:uart0=off
 #intf:uart1=off
 #intf:uart4=off
+#intf:uart9=off
 #intf:i2c1=off
 #intf:i2c5=off
 #intf:i2s3_2ch=off
