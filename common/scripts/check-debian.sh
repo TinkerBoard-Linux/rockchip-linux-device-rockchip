@@ -97,15 +97,15 @@ if [ ${QEMU_VERSION%%.*} -lt 5 ]; then
 fi
 
 # Verify the mirror source and retry a few times for a bad network
-if [ "$RK_DEBIAN_MIRROR" ] && \
-	! ping "$RK_DEBIAN_MIRROR" -c 1 -W 1 &>/dev/null && \
-	! ping "$RK_DEBIAN_MIRROR" -c 1 -W 1 &>/dev/null && \
-	! ping "$RK_DEBIAN_MIRROR" -c 1 -W 1 &>/dev/null && \
-	! ping "$RK_DEBIAN_MIRROR" -c 1 -W 1 &>/dev/null && \
-	! ping "$RK_DEBIAN_MIRROR" -c 1 -W 1 &>/dev/null; then
-	echo -e "\e[35m"
-	echo "Your network is not able to access the mirror source:"
-	echo "$RK_DEBIAN_MIRROR"
-	echo -e "\e[0m"
-	exit 1
-fi
+#if [ "$RK_DEBIAN_MIRROR" ] && \
+#	! ping "$RK_DEBIAN_MIRROR" -c 1 -W 1 &>/dev/null && \
+#	! ping "$RK_DEBIAN_MIRROR" -c 1 -W 1 &>/dev/null && \
+#	! ping "$RK_DEBIAN_MIRROR" -c 1 -W 1 &>/dev/null && \
+#	! ping "$RK_DEBIAN_MIRROR" -c 1 -W 1 &>/dev/null && \
+#	! ping "$RK_DEBIAN_MIRROR" -c 1 -W 1 &>/dev/null; then
+#	echo -e "\e[35m"
+#	echo "Your network is not able to access the mirror source:"
+#	echo "$RK_DEBIAN_MIRROR"
+#	echo -e "\e[0m"
+#	exit 1
+#fi
