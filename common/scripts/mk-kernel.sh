@@ -216,18 +216,18 @@ pack_linux_headers()
 
 	cat << EOF > "$HEADERS_PACK_SCRIPT"
 {
-	# Based on kernel/scripts/package/builddeb
+	# Based on kernel/scripts/package/builddeb (6.1)
 	find . arch/$RK_KERNEL_ARCH -maxdepth 1 -name Makefile\*
-	find include -type f -o -type l
+	find include scripts -type f -o -type l
 	find arch/$RK_KERNEL_ARCH -name module.lds -o -name Kbuild.platforms -o -name Platform
 	find \$(find arch/$RK_KERNEL_ARCH -name include -o -name scripts -type d) -type f
-	find arch/$RK_KERNEL_ARCH/include Module.symvers -type f
+	find arch/$RK_KERNEL_ARCH/include Module.symvers include scripts -type f
 	echo .config
 } | tar --no-recursion --ignore-failed-read -T - \
 	-cf "$HEADERS_TAR"
 
 	# Pack kbuild
-	tar -uf "$HEADERS_TAR" -C "$HEADERS_KBUILD_DIR" scripts/ tools/
+	tar -rf "$HEADERS_TAR" -C "$HEADERS_KBUILD_DIR" scripts/ tools/
 EOF
 
 	run_command cd "$RK_SDK_DIR/kernel"
@@ -242,7 +242,7 @@ EOF
 
 	# Packing .deb package
 	TEMP_DIR="$(mktemp -d)"
-	DEBIAN_ARCH="$KBUILD_ARCH"
+	DEBIAN_ARCH="${KBUILD_ARCH/aarch64/arm64}"
 	DEBIAN_PKG="linux-headers-${RK_KERNEL_VERSION_RAW}-$RK_KERNEL_ARCH"
 	DEBIAN_DIR="$TEMP_DIR/${DEBIAN_PKG}_$DEBIAN_ARCH"
 	DEBIAN_KBUILD_DIR="$DEBIAN_DIR/usr/src/$DEBIAN_PKG"
@@ -444,7 +444,7 @@ post_build_hook()
 
 	# Preparing kernel for linux-headers
 	make_kernel_config
-	run_command $KMAKE Image
+	run_command $KMAKE Image modules_prepare
 
 	if [ "$1" ]; then
 		pack_linux_headers "$1"
