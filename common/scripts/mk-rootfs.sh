@@ -145,6 +145,25 @@ build_debian()
 	finish_build build_debian $@
 }
 
+build_ubuntu()
+{
+	IMAGE_DIR="${1:-$RK_OUTDIR/ubuntu}"
+	ARCH=${RK_DEBIAN_ARCH:-armhf}
+
+	message "=========================================="
+	message "          Start building ubuntu ($ARCH)"
+	message "=========================================="
+
+	cd debian
+
+	VERSION_NUMBER=$VERSION_NUMBER VERSION=$VERSION ARCH=$ARCH ./mk-rootfs-ubuntu.sh
+	./mk-image.sh
+
+	ln -rsf "$PWD/linaro-rootfs.img" $IMAGE_DIR/rootfs.ext4
+
+	finish_build build_ubuntu $@
+}
+
 # Hooks
 
 usage_hook()
@@ -176,7 +195,7 @@ clean_hook()
 	rm -rf "$RK_FIRMWARE_DIR/rootfs.img"
 }
 
-INIT_CMDS="default buildroot debian yocto"
+INIT_CMDS="default buildroot debian yocto ubuntu"
 init_hook()
 {
 	load_config RK_ROOTFS
@@ -261,7 +280,7 @@ build_hook()
 	message "=========================================="
 
 	case "$ROOTFS" in
-		yocto | debian | buildroot) ;;
+		yocto | debian | buildroot | ubuntu) ;;
 		*) usage ;;
 	esac
 
@@ -274,6 +293,7 @@ build_hook()
 		yocto) build_yocto "$IMAGE_DIR" ;;
 		debian) build_debian "$IMAGE_DIR" ;;
 		buildroot) build_buildroot "$IMAGE_DIR" ;;
+		ubuntu) build_ubuntu "$ROOTFS_DIR" ;;
 	esac
 	touch "$ROOTFS_DIR/.stamp_build_finish"
 
@@ -301,6 +321,6 @@ source "${RK_BUILD_HELPER:-$(dirname "$(realpath "$0")")/../build-hooks/build-he
 
 case "${1:-rootfs}" in
 	buildroot-config | bconfig | buildroot-make | bmake) pre_build_hook $@ ;;
-	buildroot | debian | yocto) init_hook $@ ;&
+	buildroot | debian | yocto | ubuntu) init_hook $@ ;&
 	*) build_hook $@ ;;
 esac

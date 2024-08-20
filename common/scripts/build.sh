@@ -561,6 +561,8 @@ main()
 	elif [ "$RK_ROOTFS_SYSTEM" = "yocto" ];then
 		PROJECT_NAME="$RK_PROJECT_NAME-Yocto-Kirkstone-"
 		export IMAGE_VERSION="$VERSION_NUMBER"
+	elif [ "$RK_ROOTFS_SYSTEM" = "ubuntu" ];then
+		PROJECT_NAME="$RK_PROJECT_NAME-Ubuntu-22.04-"
 	fi
 
 	export RELEASE_NAME="$PROJECT_NAME$VERSION_NUMBER"
