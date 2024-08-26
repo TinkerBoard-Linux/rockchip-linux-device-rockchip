@@ -1,16 +1,14 @@
 ##### Configs for factory build #####
 ##### Hardware Interface Config #####
 
+#intf:pwm1=off
+#intf:pwm5=off
+
 ##### Driver Config #####
 
 ## Note: auto_ums: Auto enable ums mode if typeC port detect power. ##
 
 conf:auto_ums=off
-
-## Note: HDMI/DSI0: There must be at least one display setting. If not, HDMI is defaulted. ##
-
-conf:HDMI=on
-conf:DSI0=off
 
 ##### Tinker Power Management #####
 
