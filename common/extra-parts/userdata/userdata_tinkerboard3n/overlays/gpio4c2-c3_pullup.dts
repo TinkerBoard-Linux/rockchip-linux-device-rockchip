@@ -1,0 +1,29 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "rockchip,rk3568";
+
+	fragment@0 {
+		target = <&pinctrl>;
+		__overlay__ {
+			gpiokeys {
+				home_btn: home-btn@0 {
+					rockchip,pins = <4 18 0 &pcfg_pull_up>;
+				};
+
+				switch_btn: switch-btn@1 {
+					rockchip,pins = <4 19 0 &pcfg_pull_up>;
+				};
+			};
+		};
+	};
+
+	fragment@1 {
+		target-path = "/boardinfo";
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&home_btn &switch_btn>;
+		};
+	};
+};
