@@ -8,6 +8,8 @@ fi
 CMDLINETXT=release-cmdline.txt
 if [ "$VERSION" == "sdflash" ]; then
 	CMDLINETXT=sdflash-cmdline.txt
+elif [ "$VERSION" == "factory" ]; then
+	CMDLINETXT=factory-cmdline.txt
 fi
 
 # Hooks
@@ -58,6 +60,7 @@ post_build_hook()
 			cp $OUTDIR/overlays/$CMDLINETXT $OUTDIR/cmdline.txt
 			rm $OUTDIR/overlays/release-cmdline.txt
 			rm $OUTDIR/overlays/sdflash-cmdline.txt
+			rm $OUTDIR/overlays/factory-cmdline.txt
 
 			message "Auto build dtbo in $PART_NAME..."
 			rm -f $OUTDIR/overlays/*.dtbo

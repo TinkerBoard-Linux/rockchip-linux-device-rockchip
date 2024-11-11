@@ -1,0 +1,2 @@
+##### Append kernel cmdline #####
+net.ifnames=0
