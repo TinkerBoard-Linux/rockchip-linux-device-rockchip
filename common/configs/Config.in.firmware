@@ -57,7 +57,7 @@ config RK_SPLASH_IMG
 	string "splash image"
 	default "blank-splash.img"
 	help
-	  Name of splash image under <RK_IMAGE_DIR>/.
+	  Name of splash image under <RK_EXTRA_PARTS_DIR>/.
 	  Set "" for no splash.
 
 config RK_USE_FIT_IMG

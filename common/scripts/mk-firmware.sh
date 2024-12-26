@@ -20,7 +20,7 @@ build_firmware()
 	"$RK_SCRIPTS_DIR/check-grow-align.sh"
 
 	if [ "$RK_SPLASH_IMG" ]; then
-		link_image "$RK_IMAGE_DIR/$RK_SPLASH_IMG" "$RK_FIRMWARE_DIR/splash.img"
+		link_image "$RK_EXTRA_PARTS_DIR/$RK_SPLASH_IMG" "$RK_FIRMWARE_DIR/splash.img"
 	fi
 
 	link_image "$RK_CHIP_DIR/$RK_PARAMETER" "$RK_FIRMWARE_DIR/parameter.txt"
