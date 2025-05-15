@@ -1,0 +1,5 @@
+RK_KERNEL_DTS_NAME="rk3568-tinker_board_3n"
+RK_PARAMETER="parameter-buildroot-fit.txt"
+RK_USE_FIT_IMG=y
+RK_ROOTFS_SYSTEM_DEBIAN=y
+RK_UBOOT_CFG="tinker_board_3n"
