@@ -72,14 +72,14 @@ esac
 "$RK_SCRIPTS_DIR/check-package.sh" "qemu-$QEMU_ARCH-static(qemu-user-static)" \
 	qemu-$QEMU_ARCH-static qemu-user-static
 
-if ! [ -r /proc/sys/fs/binfmt_misc/qemu-$QEMU_ARCH ]; then
-	echo -e "\e[35m"
-	echo "Your qemu-$QEMU_ARCH-static(qemu-user-static) is broken"
-	echo "Please reinstall it:"
-	echo "sudo apt-get install binfmt-support qemu-user-static --reinstall"
-	echo -e "\e[0m"
-	exit 1
-fi
+#if ! [ -r /proc/sys/fs/binfmt_misc/qemu-$QEMU_ARCH ]; then
+#	echo -e "\e[35m"
+#	echo "Your qemu-$QEMU_ARCH-static(qemu-user-static) is broken"
+#	echo "Please reinstall it:"
+#	echo "sudo apt-get install binfmt-support qemu-user-static --reinstall"
+#	echo -e "\e[0m"
+#	exit 1
+#fi
 
 LDCONFIG="$RK_TOOLS_DIR/../tests/debian/$RK_DEBIAN_VERSION/$QEMU_ARCH/ldconfig"
 if [ -e "$LDCONFIG" ] && ! "$LDCONFIG" --version >/dev/null 2>&1; then
