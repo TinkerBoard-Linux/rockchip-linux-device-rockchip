@@ -68,7 +68,7 @@ do_build()
 			run_command mv kernel/defconfig \
 				"$KERNEL_CONFIG_DIR/$RK_KERNEL_CFG"
 			;;
-		kernel-modules | modules)
+		kernel-modules)
 			MOD_DIR="${2:-$RK_OUTDIR/kernel-modules}"
 			run_command $KMAKE modules
 			run_command $KMAKE modules_install \
@@ -106,6 +106,17 @@ do_build()
 			"$RK_SCRIPTS_DIR/check-power-domain.sh"
 			"$RK_SCRIPTS_DIR/check-security.sh" kernel dts
 			;;
+		modules)
+                        if [ -e $LIB_MODULES_DIR ]; then
+                                rm -rf $LIB_MODULES_DIR
+				rm -rf $RK_SDK_DIR/yocto/meta-asus/asus-overlay/overlay/lib/modules
+				rm -rf $RK_SDK_DIR/buildroot/board/rockchip/rk3399/fs-overlay/usr/lib/modules
+                        fi
+                        mkdir -p $LIB_MODULES_DIR
+
+			run_command $KMAKE modules
+			run_command $KMAKE modules_install INSTALL_MOD_PATH=$LIB_MODULES_DIR
+                        ;;
 	esac
 }
 

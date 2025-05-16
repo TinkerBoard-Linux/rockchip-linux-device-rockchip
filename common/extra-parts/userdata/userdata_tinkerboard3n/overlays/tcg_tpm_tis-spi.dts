@@ -1,0 +1,23 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "rockchip,spidev";
+
+	fragment@0 {
+		target = <&spi3>;
+		__overlay__ {
+			pinctrl-names = "default";
+			pinctrl-0 = <&spi3m1_cs0 &spi3m1_pins>;
+			cs-gpios = <&gpio4 22 0>;
+			status = "okay";
+
+			tpm@0 {
+				compatible = "tcg,tpm_tis-spi";
+				reg = <0>;
+				spi-max-frequency = <48000000>;
+				status = "okay";
+			};
+		};
+	};
+};

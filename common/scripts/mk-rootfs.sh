@@ -4,6 +4,15 @@ build_buildroot()
 {
 	check_config RK_BUILDROOT || false
 
+	cp -rf $LIB_MODULES_DIR/lib buildroot/board/rockchip/rk3566_rk3568/fs-overlay/usr/
+
+	if [ ! $VERSION_NUMBER ]; then
+        	VERSION_NUMBER="eng"
+	else
+                echo $VERSION_NUMBER > buildroot/board/rockchip/rk3566_rk3568/fs-overlay/etc/version
+	fi
+
+
 	IMAGE_DIR="${1:-$RK_OUTDIR/buildroot}"
 
 	BUILDROOT_VERSION=$(grep "export BR2_VERSION := " \
@@ -64,6 +73,8 @@ build_yocto()
 
 	"$RK_SCRIPTS_DIR/check-yocto.sh"
 
+        cp -rf $LIB_MODULES_DIR/lib yocto/meta-asus/asus-overlay/overlay/
+
 	cd yocto
 
 	# Overrided configs for Rockchip SDK
@@ -108,12 +119,27 @@ build_yocto()
 	rm -f build/conf/local.conf
 
 	if [ "$RK_YOCTO_CFG_CUSTOM" ]; then
-		if [ ! -r "$RK_CHIP_DIR/$RK_YOCTO_CFG" ]; then
-			error "$RK_CHIP_DIR/$RK_YOCTO_CFG not exist!"
-			return 1
-		fi
+#		if [ ! -r "$RK_CHIP_DIR/$RK_YOCTO_CFG" ]; then
+#			error "$RK_CHIP_DIR/$RK_YOCTO_CFG not exist!"
+#			return 1
+#		fi
 
-		echo "include $RK_CHIP_DIR/$RK_YOCTO_CFG" > build/conf/local.conf
+                if [ -r "$RK_CHIP_DIR/$RK_YOCTO_CFG" ]; then
+                        ln -rsf "$RK_CHIP_DIR/$RK_YOCTO_CFG" \
+                                build/conf/local.conf
+                elif [ -r "build/conf/$RK_YOCTO_CFG" ]; then
+                       cat build/conf/$RK_YOCTO_CFG
+                        if [ "$RK_YOCTO_CFG" != local.conf ]; then
+                                rm -f build/conf/local.conf
+                                cp build/conf/$RK_YOCTO_CFG build/conf/local.conf
+                               cat build/conf/local.conf
+                        fi
+                else
+                        error "yocto/build/conf/$RK_YOCTO_CFG not exist!"
+                        return 1
+                fi
+
+#		echo "include $RK_CHIP_DIR/$RK_YOCTO_CFG" > build/conf/local.conf
 
 		message "=========================================="
 		message "          Start building for custom $RK_YOCTO_CFG"
@@ -166,7 +192,12 @@ build_yocto()
 	fi
 
 
+	sed -i -e '/IMAGE_VERSION/d' build/conf/local.conf
+	echo IMAGE_VERSION ?= \"$IMAGE_VERSION\" >> build/conf/local.conf
+	echo RK_PROJECT_NAME ?= \"$RK_PROJECT_NAME\" >> build/conf/local.conf
+
 	source oe-init-build-env build
+        bitbake -c cleansstate core-image-minimal
 
 	LANG=en_US.UTF-8 LANGUAGE=en_US.en LC_ALL=en_US.UTF-8 \
 		bitbake core-image-minimal -C rootfs
@@ -196,10 +227,17 @@ build_debian()
 	message "=========================================="
 
 	cd debian
-	if [ ! -f linaro-$RK_DEBIAN_VERSION-alip-*.tar.gz ]; then
+
+        ROOTFS_BASE_DIR="../rootfs-base"
+
+        if [ ! -e $ROOTFS_BASE_DIR ]; then
+                ROOTFS_BASE_DIR="."
+        fi
+
+	if [ ! -f $ROOTFS_BASE_DIR/linaro-$RK_DEBIAN_VERSION-alip-*.tar.gz ]; then
 		RELEASE=$RK_DEBIAN_VERSION TARGET=desktop ARCH=$ARCH \
 			./mk-base-debian.sh
-		ln -sf linaro-$RK_DEBIAN_VERSION-alip-*.tar.gz \
+		ln -sf $ROOTFS_BASE_DIR/linaro-$RK_DEBIAN_VERSION-alip-*.tar.gz \
 			linaro-$RK_DEBIAN_VERSION-$ARCH.tar.gz
 	fi
 
@@ -210,7 +248,8 @@ build_debian()
 		sed -i "s#\(http://\)[^/]*#\1$RK_DEBIAN_MIRROR#" "$DEBIAN_SCRIPT"
 	fi
 
-	VERSION=debug ARCH=$ARCH ./$DEBIAN_SCRIPT
+
+	VERSION=$VERSION VERSION_NUMBER=$VERSION_NUMBER ARCH=$ARCH ./$DEBIAN_SCRIPT
 	./mk-image.sh
 
 	if ! [ -r "$RK_LOG_DIR/post-rootfs.log" ]; then
@@ -220,6 +259,29 @@ build_debian()
 	ln -rsf "$PWD/linaro-rootfs.img" "$IMAGE_DIR/rootfs.ext4"
 
 	finish_build build_debian $@
+}
+
+build_ubuntu()
+{
+	IMAGE_DIR="${1:-$RK_OUTDIR/ubuntu}"
+	ARCH=${RK_DEBIAN_ARCH:-armhf}
+
+        message "=========================================="
+        message "          Start building ubuntu ($ARCH)"
+        message "=========================================="
+
+
+
+
+	cd debian
+
+
+	VERSION_NUMBER=$VERSION_NUMBER VERSION=$VERSION ARCH=$ARCH ./mk-rootfs-ubuntu.sh
+	./mk-image.sh
+
+	ln -rsf "$PWD/linaro-rootfs.img" $IMAGE_DIR/rootfs.ext4
+
+	finish_build build_ubuntu $@
 }
 
 # Hooks
@@ -242,6 +304,7 @@ clean_hook()
 {
 	rm -rf yocto/build/tmp yocto/build/*cache
 	rm -rf debian/binary
+	rm -rf $LIB_MODULES_DIR
 
 	if check_config RK_BUILDROOT &>/dev/null; then
 		rm -rf buildroot/output/$RK_BUILDROOT_CFG
@@ -254,7 +317,7 @@ clean_hook()
 	rm -rf "$RK_FIRMWARE_DIR/rootfs.img"
 }
 
-INIT_CMDS="default buildroot debian yocto"
+INIT_CMDS="default buildroot debian yocto ubuntu"
 init_hook()
 {
 	load_config RK_ROOTFS
@@ -338,7 +401,7 @@ build_hook()
 	message "=========================================="
 
 	case "$ROOTFS" in
-		yocto | debian | buildroot) ;;
+		yocto | debian | ubuntu | buildroot) ;;
 		*) usage ;;
 	esac
 
@@ -351,6 +414,7 @@ build_hook()
 		yocto) build_yocto "$IMAGE_DIR" ;;
 		debian) build_debian "$IMAGE_DIR" ;;
 		buildroot) build_buildroot "$IMAGE_DIR" ;;
+		ubuntu) build_ubuntu "$ROOTFS_DIR" ;;
 	esac
 	touch "$ROOTFS_DIR/.stamp_build_finish"
 
@@ -404,6 +468,6 @@ source "${RK_BUILD_HELPER:-$(dirname "$(realpath "$0")")/build-helper}"
 case "${1:-rootfs}" in
 	buildroot-config | bconfig | buildroot-make | bmake) pre_build_hook $@ ;;
 	buildroot-sdk | bsdk) post_build_hook $@ ;;
-	buildroot | debian | yocto) init_hook $@ ;&
+	buildroot | debian | ubuntu | yocto) init_hook $@ ;&
 	*) build_hook $@ ;;
 esac

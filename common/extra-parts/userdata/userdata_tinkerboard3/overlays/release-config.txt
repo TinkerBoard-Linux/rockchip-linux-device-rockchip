@@ -1,0 +1,83 @@
+##### Hardware Interface Config #####
+
+## Note: When there is any PIN conflict, enable the latter setting.  ##
+## | PIN | ALT Fun 1 | ALT Fun 2 | ALT Fun 3 | ##
+## |   8 |      pwm2 |     uart0 |           | ##
+## |  10 |      pwm1 |     uart0 |           | ##
+## |  11 |     pwm14 |      spi3 |           | ##
+## |  13 |     pwm15 |      spi3 |           | ##
+## |  15 |     pwm12 |      spi3 |     uart9 | ##
+## |  16 |      pwm0 |     uart0 |           | ##
+## |  18 |      pwm5 |     uart0 |           | ##
+## |  22 |     pwm15 | spdif_8ch |           | ##
+## |  29 |     pwm13 |      spi3 |     uart9 | ##
+## |  32 |      pwm9 |     uart4 |           | ##
+## |  33 |      pwm8 |     uart4 |           | ##
+
+#intf:uart0=off
+#intf:uart1=off
+#intf:uart4=off
+#intf:uart9=off
+#intf:i2c1=off
+#intf:i2c5=off
+#intf:i2s3_2ch=off
+#intf:spi2=off
+#intf:spi3=off
+#intf:spdif_8ch=off
+#intf:pwm0=off
+#intf:pwm1=off
+#intf:pwm2=off
+#intf:pwm5=off
+#intf:pwm7=off
+#intf:pwm8=off
+#intf:pwm9=off
+#intf:pwm12=off
+#intf:pwm13=off
+#intf:pwm14=off
+#intf:pwm15=off
+#intf:xin32k=off
+
+##### Driver Config #####
+
+## Note: auto_ums: Auto enable ums mode if typeC port detect power. ##
+
+conf:auto_ums=on
+
+## Note: HDMI/DSI0: There must be at least one display setting. If not, HDMI is defaulted. ##
+
+conf:HDMI=on
+conf:DSI0=off
+
+##### Tinker Power Management #####
+
+cpu_governor=ondemand
+a55_minfreq=408000
+a55_maxfreq=1992000
+
+gpu_governor=simple_ondemand
+g52_minfreq=200000000
+g52_maxfreq=800000000
+
+##### List of device tree overlays to load. Format: overlay=<dtbo name, no extension> <dtbo2> ... #####
+
+## Note: Put dtbo files under the overlays folder. ##
+
+#overlay=mipi2lvds2_G185XW01
+#overlay=mipi2lvds2_G156BGE-L01
+#overlay=mipi2lvds2_G240HVT01
+#overlay=mipi2lvds2_LM215WF3-SLN1
+#overlay=mipi2lvds2_G156HAN02
+#overlay=mipi2lvds2_AM1280800P2TZQW
+#overlay=mipi2lvds2_G215HAN01
+#overlay=mipi2edp_G156HAB02
+#overlay=dsi_LKW070N13000-V2
+#overlay=asus_pwm_capture
+#overlay=rk809_factory_use
+#overlay=hifiberry-dac
+#overlay=hifiberry-dacplus
+#overlay=hifiberry-digi
+#overlay=iqaudio-dacplus
+#overlay=iqaudio-digi-wm8804-audio
+#overlay=justboom-dac
+#overlay=justboom-digi
+overlay=

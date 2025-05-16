@@ -4,6 +4,7 @@ BOARD=$(echo ${RK_KERNEL_DTS_NAME:-$(echo "$RK_DEFCONFIG" | \
 	sed -n "s/.*\($RK_CHIP.*\)_defconfig/\1/p")} | \
 	tr '[:lower:]' '[:upper:]')
 
+
 build_all()
 {
 	message "=========================================="
@@ -18,6 +19,7 @@ build_all()
 	[ -z "$RK_MISC" ] || "$RK_SCRIPTS_DIR/mk-misc.sh"
 	[ -z "$RK_LOADER" ] || "$RK_SCRIPTS_DIR/mk-loader.sh"
 	[ -z "$RK_KERNEL" ] || "$RK_SCRIPTS_DIR/mk-kernel.sh"
+	[ -z "$RK_KERNEL" ] || "$RK_SCRIPTS_DIR/mk-kernel.sh" modules
 	[ -z "$RK_ROOTFS" ] || "$RK_SCRIPTS_DIR/mk-rootfs.sh"
 	[ -z "$RK_SECURITY_INITRD_CFG" ] || \
 		"$RK_SCRIPTS_DIR/mk-security.sh" security-ramboot
@@ -37,14 +39,16 @@ build_release()
 	message "=========================================="
 
 	shift
-	RELEASE_BASE_DIR="$RK_OUTDIR/releases/${1:+$1/}${2:-$BOARD}"
-	case "$(readlink "$RK_OUTDIR/rootfs")" in
-		buildroot) RELEASE_DIR="$RELEASE_BASE_DIR/BUILDROOT" ;;
-		debian) RELEASE_DIR="$RELEASE_BASE_DIR/DEBIAN" ;;
-		yocto) RELEASE_DIR="$RELEASE_BASE_DIR/YOCTO" ;;
-		*) RELEASE_DIR="$RELEASE_BASE_DIR" ;;
-	esac
-	[ "$1" ] || RELEASE_DIR="$RELEASE_DIR/$(date  +%Y%m%d_%H%M%S)"
+	#RELEASE_BASE_DIR="$RK_OUTDIR/releases/${1:+$1/}${2:-$BOARD}"
+	#case "$(readlink "$RK_OUTDIR/rootfs")" in
+	#	buildroot) RELEASE_DIR="$RELEASE_BASE_DIR/BUILDROOT" ;;
+	#	debian) RELEASE_DIR="$RELEASE_BASE_DIR/DEBIAN" ;;
+	#	yocto) RELEASE_DIR="$RELEASE_BASE_DIR/YOCTO" ;;
+	#	*) RELEASE_DIR="$RELEASE_BASE_DIR" ;;
+	#esac
+	#[ "$1" ] || RELEASE_DIR="$RELEASE_DIR/$(date  +%Y%m%d_%H%M%S)"
+        RELEASE_BASE_DIR=$RK_SDK_DIR/IMAGE
+        RELEASE_DIR=$RELEASE_BASE_DIR/$RELEASE_NAME
 
 	rm -rf "$RELEASE_DIR"
 	mkdir -p "$RELEASE_DIR"
@@ -82,7 +86,7 @@ build_release()
 		message "Saving patches..."
 		PATCHES_DIR="$RELEASE_DIR/PATCHES"
 		mkdir -p "$PATCHES_DIR"
-		.repo/repo/repo forall -j $(( $CPUS + 1 )) -c \
+		${PYTHON3:-python3} .repo/repo/repo forall -j $(( $CPUS + 1 )) -c \
 			"\"$RK_SCRIPTS_DIR/release-patches.sh\" \
 			\"$PATCHES_DIR/\$REPO_PATH\" \$REPO_PATH \$REPO_LREV"
 		install -D -m 0755 "$RK_DATA_DIR/apply-all.sh" "$PATCHES_DIR"
@@ -97,6 +101,29 @@ build_release()
 
 	rm -rf "$RK_OUTDIR/release"
 	ln -vsf "$RELEASE_DIR" "$RK_OUTDIR/release"
+
+        if [ "$VERSION" == "release" ]; then
+                mv $RELEASE_DIR/IMAGES/sdcard_full.img $RELEASE_DIR/$RELEASE_NAME.img
+		mv $RELEASE_DIR/IMAGES/sdcard_uboot.img $RELEASE_DIR/$RECOVERY_RELEASE_NAME.img 
+		cp $RELEASE_DIR/IMAGES/update_uboot.img $RELEASE_DIR/$RECOVERY_RELEASE_NAME-rktools.img
+		mv $RELEASE_DIR/IMAGES/spinor_uboot.img $RELEASE_DIR/$SPINOR_RECOVERY_RELEASE_NAME.img
+                zip -j -m -T $RELEASE_DIR/$RELEASE_NAME.zip $RELEASE_DIR/$RELEASE_NAME.img
+                zip -j -m -T $RELEASE_DIR/$RECOVERY_RELEASE_NAME.zip $RELEASE_DIR/$RECOVERY_RELEASE_NAME.img
+		zip -j -m -T $RELEASE_DIR/$RECOVERY_RELEASE_NAME-rktools.zip $RELEASE_DIR/$RECOVERY_RELEASE_NAME-rktools.img
+		zip -j -m -T $RELEASE_DIR/$SPINOR_RECOVERY_RELEASE_NAME.zip $RELEASE_DIR/$SPINOR_RECOVERY_RELEASE_NAME.img
+		cd $RELEASE_DIR
+                sha256sum $RELEASE_NAME.zip > $RELEASE_NAME.zip.sha256sum
+                sha256sum $RECOVERY_RELEASE_NAME.zip > $RECOVERY_RELEASE_NAME.zip.sha256sum
+		sha256sum $RECOVERY_RELEASE_NAME-rktools.zip > $RECOVERY_RELEASE_NAME-rktools.zip.sha256sum
+		sha256sum $SPINOR_RECOVERY_RELEASE_NAME.zip > $SPINOR_RECOVERY_RELEASE_NAME.zip.sha256sum
+		cd -
+	elif [ "$VERSION" == "sdflash" ]; then
+		mv $RELEASE_DIR/IMAGES/sdcard_full.img $RELEASE_DIR/$RELEASE_NAME.img
+		zip -j -m -T $RELEASE_DIR/$RELEASE_NAME.zip $RELEASE_DIR/$RELEASE_NAME.img
+		cd $RELEASE_DIR
+		sha256sum $RELEASE_NAME.zip > $RELEASE_NAME.zip.sha256sum
+		cd -
+	fi
 
 	finish_build
 }

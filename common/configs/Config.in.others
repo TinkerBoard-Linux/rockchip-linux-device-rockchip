@@ -30,6 +30,10 @@ config RK_SAVE_ALL
 
 endchoice # patches saving
 
+config RK_PROJECT_NAME
+        string "project name "
+        default "Tinker_Board_3N""
+
 config RK_EXTRA_CONFIGS
 	string "extra custom configs"
 

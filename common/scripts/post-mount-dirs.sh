@@ -10,4 +10,4 @@ ln -sf udisk mnt/usb_storage
 ln -sf sdcard mnt/external_sd
 ln -sf mnt/udisk udisk
 ln -sf mnt/sdcard sdcard
-ln -sf userdata data
+mkdir data

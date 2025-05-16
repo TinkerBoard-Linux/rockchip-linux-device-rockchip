@@ -4,8 +4,8 @@ RK_SCRIPTS_DIR="${RK_SCRIPTS_DIR:-$(dirname "$(realpath "$0")")}"
 RK_SDK_DIR="${RK_SDK_DIR:-$(realpath "$RK_SCRIPTS_DIR/../../../..")}"
 
 # Needs VPN to fetch sources
-"$RK_SCRIPTS_DIR/check-network.sh" www.google.com www.google.com \
-	"Please setup a VPN to bypass the GFW."
+#"$RK_SCRIPTS_DIR/check-network.sh" www.google.com www.google.com \
+#	"Please setup a VPN to bypass the GFW."
 
 "$RK_SCRIPTS_DIR/check-package.sh" zstd
 

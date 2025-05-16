@@ -53,6 +53,25 @@ config RK_MISC_IMG
 endif # Misc
 endmenuconfig # Misc
 
+config RK_PACKAGE_UBOOT_FILE
+        string "custom package-file"
+        default "package-file"
+        help
+          Name of custom package-file under <CHIP_DIR>/.
+
+config RK_PARAMETER_UBOOT
+        string "parameter for uboot only"
+        default "parameter-buildroot-fit-uboot.txt"
+        help
+          Name of parameter file under <CHIP_DIR>/.
+
+config RK_SPLASH_IMG
+        string "splash image"
+        default "blank-splash.img"
+        help
+          Name of splash image under <RK_IMAGE_DIR>/.
+          Set "" for no splash.
+
 config RK_USE_FIT_IMG
 	bool "use FIT (Flattened Image Tree) image"
 

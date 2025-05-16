@@ -415,6 +415,27 @@ setup_environments()
 	export RK_OWNER="$(stat --format %U "$RK_SDK_DIR")"
 	export RK_OWNER_UID="$(stat --format %u "$RK_SDK_DIR")"
 
+        if [ ! $VERSION ]; then
+                export VERSION="debug"
+        fi
+        echo $VERSION
+
+
+        if [ ! $VERSION_NUMBER ]; then
+                VERSION_NUMBER="eng-$USER"
+        fi
+        VERSION_NUMBER="$VERSION_NUMBER-$(date +%Y%m%d)"
+
+        if [ "$VERSION" == "debug" ]; then
+                export VERSION_NUMBER="$VERSION_NUMBER-debug"
+        elif [ "$VERSION" == "factory" ]; then
+                export VERSION_NUMBER="$VERSION_NUMBER-factory"
+        elif [ "$VERSION" == "release" ]; then
+                export VERSION_NUMBER="$VERSION_NUMBER-release"
+        elif [ "$VERSION" == "sdflash" ]; then
+                export VERSION_NUMBER="$VERSION_NUMBER"
+        fi
+
 	RK_PARSED_CMDS="$RK_OUTDIR/.parsed_cmds"
 	RK_MAKE_USAGE="$RK_OUTDIR/.make_usage"
 }
@@ -667,6 +688,31 @@ main()
 	source "$RK_CONFIG"
 	cp "$RK_CONFIG" "$RK_LOG_DIR"
 	export RK_KERNEL_VERSION="$(kernel_version)"
+
+        #echo "$RK_ROOTFS_SYSTEM"
+
+        if [ "$RK_ROOTFS_SYSTEM" = "debian" ];then
+                PROJECT_NAME="$RK_PROJECT_NAME-Debian-Bullseye"
+        elif [ "$RK_ROOTFS_SYSTEM" = "yocto" ];then
+                PROJECT_NAME="$RK_PROJECT_NAME-Yocto-Kirkstone"
+                export IMAGE_VERSION="$VERSION_NUMBER"
+	elif [ "$RK_ROOTFS_SYSTEM" = "ubuntu" ];then
+		PROJECT_NAME="$RK_PROJECT_NAME-Ubuntu-base"
+        elif [ "$RK_ROOTFS_SYSTEM" = "buildroot" ];then
+                PROJECT_NAME="$RK_PROJECT_NAME-On_Device_Flash_Software"
+                export IMAGE_VERSION="$VERSION_NUMBER"
+        fi
+
+        export RELEASE_NAME="$PROJECT_NAME-$VERSION_NUMBER"
+        export RECOVERY_RELEASE_NAME="$RELEASE_NAME-Recovery"
+        export SPINOR_RECOVERY_RELEASE_NAME="SPINOR-$RELEASE_NAME-Recovery"
+
+        echo "VERSION_NUMBER: $VERSION_NUMBER"
+        echo "RELEASE_NAME: $RELEASE_NAME"
+        echo "RECOVERY_RELEASE_NAME: $RECOVERY_RELEASE_NAME"
+        echo "SPINOR_RECOVERY_RELEASE_NAME: $SPINOR_RECOVERY_RELEASE_NAME"
+
+        export LIB_MODULES_DIR=$RK_SDK_DIR/debian/lib_modules
 
 	if [ -z "$INITIAL_SESSION" ]; then
 		# Inherit session environments

@@ -1,5 +1,17 @@
 #!/bin/bash -e
 
+CONFIGTXT=release-config.txt
+if [ "$VERSION" == "factory" ]; then
+	CONFIGTXT=factory-config.txt
+fi
+
+CMDLINETXT=release-cmdline.txt
+if [ "$VERSION" == "sdflash" ]; then
+	CMDLINETXT=sdflash-cmdline.txt
+elif [ "$VERSION" == "factory" ]; then
+	CMDLINETXT=factory-cmdline.txt
+fi
+
 # Hooks
 
 usage_hook()
@@ -39,6 +51,30 @@ post_build_hook()
 
 		if [ "$FS_TYPE" = "ubifs" ] && [ "$SIZE" = auto ]; then
 			SIZE=max
+		fi
+
+		if [ "$PART_NAME" = userdata ]; then
+			cp $OUTDIR/overlays/$CONFIGTXT $OUTDIR/config.txt
+			rm $OUTDIR/overlays/release-config.txt
+			rm $OUTDIR/overlays/factory-config.txt
+
+			cp $OUTDIR/overlays/$CMDLINETXT $OUTDIR/cmdline.txt
+			rm $OUTDIR/overlays/release-cmdline.txt
+			rm $OUTDIR/overlays/sdflash-cmdline.txt
+			rm $OUTDIR/overlays/factory-cmdline.txt
+
+			message "Auto build dtbo in $PART_NAME..."
+			rm -f $OUTDIR/overlays/*.dtbo
+
+			for file in $OUTDIR/overlays/*.dts
+			do
+				dts=${file##*/}
+				dtbo=${dts%.*}
+				if [ "$dts" = "*.dts"  ]; then
+					break
+				fi
+				dtc -@ -O dtb -o $OUTDIR/overlays/$dtbo.dtbo $OUTDIR/overlays/$dts
+			done
 		fi
 
 		if [ "$SIZE" = max ]; then

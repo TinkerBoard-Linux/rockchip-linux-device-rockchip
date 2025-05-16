@@ -1,0 +1,17 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "rockchip,rk3568";
+
+        fragment@0 {
+                target-path ="/pwm@fe700030";
+                __overlay__ {
+			status = "okay";
+			compatible = "asus,pwm-capture";
+			asus_pwm_id = <3>;
+			handle_cpu_id = <1>;
+			pinctrl-names = "default";
+		};
+	};
+};
