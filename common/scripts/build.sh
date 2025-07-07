@@ -692,9 +692,9 @@ main()
         #echo "$RK_ROOTFS_SYSTEM"
 
         if [ "$RK_ROOTFS_SYSTEM" = "debian" ];then
-                PROJECT_NAME="$RK_PROJECT_NAME-Debian-Bullseye"
+                PROJECT_NAME="$RK_PROJECT_NAME-Debian-Bookworm"
         elif [ "$RK_ROOTFS_SYSTEM" = "yocto" ];then
-                PROJECT_NAME="$RK_PROJECT_NAME-Yocto-Kirkstone"
+                PROJECT_NAME="$RK_PROJECT_NAME-Yocto-Scarthgap"
                 export IMAGE_VERSION="$VERSION_NUMBER"
 	elif [ "$RK_ROOTFS_SYSTEM" = "ubuntu" ];then
 		PROJECT_NAME="$RK_PROJECT_NAME-Ubuntu-base"
